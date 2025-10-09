@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gobang-pattern-practice"
+version = "1.0.0"
+authors = [
+    {name = "Xu Huicong"},
+]
+description = "A Five-in-a-Row pattern practice system for learning classic game strategies"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Games/Entertainment :: Board Games",
+]
+keywords = ["game", "gobang", "five-in-a-row", "board-game", "python"]
+dependencies = [
+    "pygame>=2.0.0",
+    "numpy>=1.19.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0.0",
+    "flake8>=4.0.0",
+    "black>=21.0.0",
+    "mypy>=0.900",
+]
+ai = [
+    "scikit-learn>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/gobang-game"
+Repository = "https://github.com/yourusername/gobang-game"
+"Bug Reports" = "https://github.com/yourusername/gobang-game/issues"
+
+[project.scripts]
+gobang = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["game*", "gui*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
