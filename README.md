@@ -26,7 +26,7 @@
 
 1. 克隆项目到本地：
 ```bash
-git clone https://github.com/XuHuicong/Gobang-Game.git
+git clone https://github.com/Huicong967/Gobang-Game.git
 cd Gobang-Game
 ```
 
@@ -102,7 +102,7 @@ gobang-game/
 ## 作者
 
 - **Xu Huicong** - 项目创建者和唯一开发者
-- GitHub: [@XuHuicong](https://github.com/XuHuicong)
+- GitHub: [@Huicong967](https://github.com/Huicong967)
 
 ## 致谢
 
