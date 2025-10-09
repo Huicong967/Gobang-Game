@@ -20,7 +20,7 @@ class GameWindow:
     def __init__(self):
         """初始化游戏窗口"""
         self.root = tk.Tk()
-        self.root.title("五子棋棋谱练习系统 - by Xu Huicong")
+        self.root.title("五子棋棋谱对战系统 - 玩家vs电脑 - by Xu Huicong")
         self.root.geometry("1000x700")
         self.root.resizable(False, False)
         
@@ -74,12 +74,12 @@ class GameWindow:
         info_frame.grid(row=0, column=1, sticky="nsew")
         
         # 棋谱信息
-        self.pattern_info_var = tk.StringVar(value="请选择棋谱开始练习")
+        self.pattern_info_var = tk.StringVar(value="请选择棋谱开始对战练习")
         pattern_info_label = ttk.Label(info_frame, textvariable=self.pattern_info_var, font=("Arial", 10, "bold"))
         pattern_info_label.pack(anchor="w", pady=(0, 10))
         
         # 当前状态
-        self.status_var = tk.StringVar(value="等待开始...")
+        self.status_var = tk.StringVar(value="你执黑子，电脑执白子")
         status_label = ttk.Label(info_frame, textvariable=self.status_var, font=("Arial", 9))
         status_label.pack(anchor="w", pady=(0, 10))
         
@@ -165,7 +165,7 @@ class GameWindow:
                         )
     
     def on_canvas_click(self, event):
-        """处理棋盘点击事件"""
+        """处理棋盘点击事件 - 玩家vs电脑模式"""
         # 计算点击的网格位置
         x = event.x - self.margin
         y = event.y - self.margin
@@ -187,36 +187,64 @@ class GameWindow:
             self.add_hint("请先选择一个棋谱进行练习！")
             return
         
-        # 获取当前应该下棋的玩家
-        current_player = self.validator.get_current_player()
-        if current_player is None:
-            self.add_hint("棋谱已完成！")
+        # 检查是否轮到玩家
+        if not self.validator.is_player_turn():
+            self.add_hint("现在轮到电脑下棋，请等待...")
             return
         
-        # 验证走法
-        result = self.validator.validate_move(row, col, current_player)
+        # 验证玩家走法（玩家执黑子）
+        result = self.validator.validate_player_move(row, col)
         
         if result['valid']:
-            # 走法正确，落子
-            self.board.make_move(row, col, current_player)
+            # 玩家走法正确，落子
+            self.board.make_move(row, col, 1)  # 玩家执黑子
             self.draw_stones()
             self.add_hint(result['message'])
+            self.update_status()
             
             if result['pattern_complete']:
                 self.show_pattern_analysis()
-            else:
-                self.update_status()
+            elif result['computer_move']:
+                # 延迟执行电脑走法，让玩家看到自己的落子
+                self.root.after(1000, self.make_computer_move)
         else:
-            # 走法错误
+            # 玩家走法错误
             self.add_hint(result['message'])
             
             if result['show_answer']:
-                # 显示正确答案并自动落子
-                correct_move = self.validator.auto_make_move()
-                if correct_move:
-                    self.draw_stones()
-                    self.add_hint(f"系统自动执行正确走法：{self._format_move(correct_move)}")
-                    self.update_status()
+                # 3次错误后自动执行正确走法
+                self.root.after(2000, self.auto_make_correct_move)
+    
+    def make_computer_move(self):
+        """电脑自动下棋"""
+        if not self.validator.is_computer_turn():
+            return
+        
+        result = self.validator.make_computer_move()
+        
+        if result['move']:
+            row, col, player = result['move']
+            self.draw_stones()  # 重新绘制棋盘
+            self.add_hint(result['message'])
+            self.update_status()
+            
+            if result['pattern_complete']:
+                self.show_pattern_analysis()
+        else:
+            self.add_hint(result['message'])
+    
+    def auto_make_correct_move(self):
+        """自动执行正确走法（3次错误后）"""
+        correct_move = self.validator.auto_make_correct_move()
+        if correct_move:
+            self.draw_stones()
+            player_name = "玩家" if correct_move[2] == 1 else "电脑"
+            self.add_hint(f"系统演示：{player_name}正确走法 {self._format_move(correct_move)}")
+            self.update_status()
+            
+            # 如果刚才是玩家的走法，现在轮到电脑
+            if correct_move[2] == 1 and self.validator.is_computer_turn():
+                self.root.after(1500, self.make_computer_move)
     
     def show_pattern_selection(self):
         """显示棋谱选择对话框"""
@@ -264,35 +292,61 @@ class GameWindow:
         
         self.board.reset()
         self.pattern_manager.reset_pattern()
-        self.validator.reset_errors()
+        self.validator.reset_game()
         self.draw_board()
         self.update_status()
         self.clear_analysis()
-        self.add_hint("棋谱重新开始，请按照棋谱要求下棋！")
+        self.add_hint("棋谱重新开始！你执黑子先手，按照棋谱走法下棋。")
     
     def undo_move(self):
-        """悔棋"""
-        if self.board.move_history:
-            self.board.undo_move()
-            # 同时回退棋谱步骤
-            if self.pattern_manager.current_step > 0:
-                self.pattern_manager.current_step -= 1
+        """悔棋 - 撤销最近的一步或两步（玩家+电脑）"""
+        if len(self.board.move_history) == 0:
+            self.add_hint("没有可以悔棋的步骤！")
+            return
+        
+        # 如果最后一步是电脑下的，需要撤销两步回到玩家回合
+        moves_to_undo = 1
+        if len(self.board.move_history) > 0:
+            last_move = self.board.move_history[-1]
+            if last_move[2] == 2:  # 最后一步是电脑(白子)
+                moves_to_undo = 2
+        
+        # 执行悔棋
+        undone_moves = []
+        for _ in range(min(moves_to_undo, len(self.board.move_history))):
+            undone_move = self.board.undo_move()
+            if undone_move:
+                undone_moves.append(undone_move)
+                # 回退棋谱步骤
+                if self.pattern_manager.current_step > 0:
+                    self.pattern_manager.current_step -= 1
+        
+        if undone_moves:
             self.validator.reset_errors()
+            self.validator.current_turn = 1  # 确保轮到玩家
             self.draw_board()
             self.update_status()
-            self.add_hint("已悔棋一步！")
+            if len(undone_moves) == 1:
+                self.add_hint("已悔棋一步！")
+            else:
+                self.add_hint(f"已悔棋{len(undone_moves)}步，回到你的回合！")
         else:
-            self.add_hint("没有可以悔棋的步骤！")
+            self.add_hint("悔棋失败！")
     
     def show_answer(self):
         """显示当前步骤的正确答案"""
-        expected_move = self.pattern_manager.get_current_move()
-        if expected_move:
-            row, col, player = expected_move
-            player_name = "黑子" if player == 1 else "白子"
-            self.add_hint(f"当前正确走法：{player_name}下在 {self._format_position(row, col)}")
+        if self.validator.is_player_turn():
+            expected_move = self.pattern_manager.get_current_move()
+            if expected_move:
+                row, col, player = expected_move
+                if player == 1:  # 确保是玩家的回合
+                    self.add_hint(f"提示：你应该下在 {self._format_position(row, col)}")
+                else:
+                    self.add_hint("现在应该轮到电脑下棋！")
+            else:
+                self.add_hint("棋谱已完成！")
         else:
-            self.add_hint("棋谱已完成！")
+            self.add_hint("现在轮到电脑下棋，请耐心等待！")
     
     def update_status(self):
         """更新状态信息"""
@@ -313,12 +367,12 @@ class GameWindow:
         if self.pattern_manager.is_pattern_complete():
             self.status_var.set("棋谱完成！")
         else:
-            current_player = self.validator.get_current_player()
-            if current_player:
-                player_name = "黑子" if current_player == 1 else "白子"
+            if self.validator.is_player_turn():
                 error_info = self.validator.get_error_info()
-                status_text = f"轮到：{player_name} | 错误次数：{error_info['error_count']}/{error_info['max_errors']}"
-                self.status_var.set(status_text)
+                status_text = f"轮到：玩家(黑子) | 错误次数：{error_info['error_count']}/{error_info['max_errors']}"
+            else:
+                status_text = "轮到：电脑(白子) | 正在思考中..."
+            self.status_var.set(status_text)
     
     def add_hint(self, message):
         """添加提示信息"""

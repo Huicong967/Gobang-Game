@@ -8,16 +8,12 @@ echo.
 echo 请确保已在GitHub创建了仓库：gobang-pattern-practice
 echo.
 
-set /p username="请输入你的GitHub用户名: "
-if "%username%"=="" (
-    echo 用户名不能为空！
-    pause
-    exit /b 1
-)
+echo GitHub用户名: Huicong967
+echo 仓库名: Gobang-Game
 
 echo.
 echo 正在设置远程仓库...
-git remote add origin https://github.com/%username%/gobang-pattern-practice.git
+git remote add origin https://github.com/Huicong967/Gobang-Game.git
 
 echo 正在重命名分支为main...
 git branch -M main

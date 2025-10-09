@@ -66,13 +66,18 @@ class TestGameBasics:
         pm.load_pattern("classic_1")
         validator = MoveValidator(pm, board)
         
-        # 测试正确走法
-        result = validator.validate_move(7, 7, 1)
+        # 测试玩家正确走法
+        result = validator.validate_player_move(7, 7)
         assert result['valid'] == True
         
-        # 测试错误走法
-        result = validator.validate_move(0, 0, 1)
+        # 测试玩家错误走法
+        result = validator.validate_player_move(0, 0)
         assert result['valid'] == False
+        
+        # 测试电脑走法
+        if result['valid']:
+            computer_result = validator.make_computer_move()
+            assert computer_result['move'] is not None
 
     def test_win_condition(self):
         """测试胜利条件检查"""
