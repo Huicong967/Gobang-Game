@@ -1,5 +1,7 @@
 """
+Pattern Manager
 棋谱管理器
+Handle pattern loading, parsing and management
 处理棋谱的加载、解析和管理
 """
 
@@ -32,21 +34,21 @@ class PatternManager:
         built_in_patterns = [
             {
                 "id": "classic_1",
-                "name": "经典开局-天元开局",
-                "difficulty": "初级",
-                "description": "最经典的天元开局棋谱，学习基础攻防"
+                "name": "Classic Opening - Tian Yuan / 经典开局-天元开局",
+                "difficulty": "Beginner / 初级",
+                "description": "Most classic Tian Yuan opening pattern, learn basic offense and defense / 最经典的天元开局棋谱，学习基础攻防"
             },
             {
                 "id": "classic_2", 
-                "name": "经典开局-花月局",
-                "difficulty": "中级",
-                "description": "花月局的经典下法，学习复杂攻防转换"
+                "name": "Classic Opening - Hua Yue / 经典开局-花月局",
+                "difficulty": "Intermediate / 中级",
+                "description": "Classic Hua Yue play, learn complex offense-defense transitions / 花月局的经典下法，学习复杂攻防转换"
             },
             {
                 "id": "classic_3",
-                "name": "经典开局-浦月局",
-                "difficulty": "高级",
-                "description": "浦月局的精妙变化，学习高级战术"
+                "name": "Classic Opening - Pu Yue / 经典开局-浦月局",
+                "difficulty": "Advanced / 高级",
+                "description": "Exquisite Pu Yue variations, learn advanced tactics / 浦月局的精妙变化，学习高级战术"
             }
         ]
         

@@ -1,5 +1,7 @@
 """
+Game Main Window
 游戏主窗口
+Create GUI using tkinter
 使用tkinter创建图形界面
 """
 
@@ -20,7 +22,7 @@ class GameWindow:
     def __init__(self):
         """初始化游戏窗口"""
         self.root = tk.Tk()
-        self.root.title("五子棋棋谱对战系统 - 玩家vs电脑 - by Xu Huicong")
+        self.root.title("Gobang Pattern Battle - Player vs Computer - by Xu Huicong / 五子棋棋谱对战系统 - 玩家vs电脑")
         self.root.geometry("1000x700")
         self.root.resizable(False, False)
         
@@ -47,8 +49,8 @@ class GameWindow:
         main_frame = ttk.Frame(self.root)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # 左侧 - 游戏区域
-        game_frame = ttk.LabelFrame(main_frame, text="棋盘", padding="10")
+        # 左侧 - 游戏区域 / Left side - Game area
+        game_frame = ttk.LabelFrame(main_frame, text="Board / 棋盘", padding="10")
         game_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
         
         # 棋盘画布
@@ -64,22 +66,22 @@ class GameWindow:
         control_frame = ttk.Frame(game_frame)
         control_frame.pack(pady=(10, 0))
         
-        ttk.Button(control_frame, text="选择棋谱", command=self.show_pattern_selection).pack(side=tk.LEFT, padx=5)
-        ttk.Button(control_frame, text="重新开始", command=self.restart_pattern).pack(side=tk.LEFT, padx=5)
-        ttk.Button(control_frame, text="悔棋", command=self.undo_move).pack(side=tk.LEFT, padx=5)
-        ttk.Button(control_frame, text="显示答案", command=self.show_answer).pack(side=tk.LEFT, padx=5)
+        ttk.Button(control_frame, text="Select Pattern / 选择棋谱", command=self.show_pattern_selection).pack(side=tk.LEFT, padx=5)
+        ttk.Button(control_frame, text="Restart / 重新开始", command=self.restart_pattern).pack(side=tk.LEFT, padx=5)
+        ttk.Button(control_frame, text="Undo / 悔棋", command=self.undo_move).pack(side=tk.LEFT, padx=5)
+        ttk.Button(control_frame, text="Show Answer / 显示答案", command=self.show_answer).pack(side=tk.LEFT, padx=5)
         
-        # 右侧 - 信息区域
-        info_frame = ttk.LabelFrame(main_frame, text="游戏信息", padding="10")
+        # 右侧 - 信息区域 / Right side - Information area
+        info_frame = ttk.LabelFrame(main_frame, text="Game Info / 游戏信息", padding="10")
         info_frame.grid(row=0, column=1, sticky="nsew")
         
-        # 棋谱信息
-        self.pattern_info_var = tk.StringVar(value="请选择棋谱开始对战练习")
+        # 棋谱信息 / Pattern information
+        self.pattern_info_var = tk.StringVar(value="Please select a pattern to start battle / 请选择棋谱开始对战练习")
         pattern_info_label = ttk.Label(info_frame, textvariable=self.pattern_info_var, font=("Arial", 10, "bold"))
         pattern_info_label.pack(anchor="w", pady=(0, 10))
         
-        # 当前状态
-        self.status_var = tk.StringVar(value="你执黑子，电脑执白子")
+        # 当前状态 / Current status
+        self.status_var = tk.StringVar(value="You use black stones, computer uses white / 你执黑子，电脑执白子")
         status_label = ttk.Label(info_frame, textvariable=self.status_var, font=("Arial", 9))
         status_label.pack(anchor="w", pady=(0, 10))
         
@@ -88,13 +90,13 @@ class GameWindow:
         step_label = ttk.Label(info_frame, textvariable=self.step_var)
         step_label.pack(anchor="w", pady=(0, 10))
         
-        # 提示信息区域
-        ttk.Label(info_frame, text="提示信息:", font=("Arial", 9, "bold")).pack(anchor="w")
+        # 提示信息区域 / Hint information area
+        ttk.Label(info_frame, text="Hints / 提示信息:", font=("Arial", 9, "bold")).pack(anchor="w")
         self.hint_text = scrolledtext.ScrolledText(info_frame, width=40, height=8, wrap=tk.WORD)
         self.hint_text.pack(fill=tk.BOTH, expand=True, pady=(5, 10))
         
-        # 棋谱分析区域
-        ttk.Label(info_frame, text="棋谱分析:", font=("Arial", 9, "bold")).pack(anchor="w")
+        # 棋谱分析区域 / Pattern analysis area
+        ttk.Label(info_frame, text="Pattern Analysis / 棋谱分析:", font=("Arial", 9, "bold")).pack(anchor="w")
         self.analysis_text = scrolledtext.ScrolledText(info_frame, width=40, height=10, wrap=tk.WORD)
         self.analysis_text.pack(fill=tk.BOTH, expand=True, pady=(5, 0))
         
@@ -177,19 +179,19 @@ class GameWindow:
         if not (0 <= row < self.board.size and 0 <= col < self.board.size):
             return
         
-        # 检查该位置是否已有棋子
+        # 检查该位置是否已有棋子 / Check if position is occupied
         if not self.board.is_valid_move(row, col):
-            self.add_hint("该位置已有棋子，请选择其他位置！")
+            self.add_hint("Position occupied, please choose another one! / 该位置已有棋子，请选择其他位置！")
             return
         
-        # 检查是否已选择棋谱
+        # 检查是否已选择棋谱 / Check if pattern is selected
         if not self.pattern_manager.current_pattern:
-            self.add_hint("请先选择一个棋谱进行练习！")
+            self.add_hint("Please select a pattern first! / 请先选择一个棋谱进行练习！")
             return
         
-        # 检查是否轮到玩家
+        # 检查是否轮到玩家 / Check if it's player's turn
         if not self.validator.is_player_turn():
-            self.add_hint("现在轮到电脑下棋，请等待...")
+            self.add_hint("Computer's turn, please wait... / 现在轮到电脑下棋，请等待...")
             return
         
         # 验证玩家走法（玩家执黑子）
@@ -250,15 +252,15 @@ class GameWindow:
         """显示棋谱选择对话框"""
         patterns = self.pattern_manager.get_patterns_list()
         
-        # 创建选择窗口
+        # 创建选择窗口 / Create selection window
         selection_window = tk.Toplevel(self.root)
-        selection_window.title("选择棋谱")
-        selection_window.geometry("400x300")
+        selection_window.title("Select Pattern / 选择棋谱")
+        selection_window.geometry("500x350")
         selection_window.transient(self.root)
         selection_window.grab_set()
         
-        # 棋谱列表
-        ttk.Label(selection_window, text="请选择要练习的棋谱：", font=("Arial", 10, "bold")).pack(pady=10)
+        # 棋谱列表 / Pattern list
+        ttk.Label(selection_window, text="Please select a pattern for practice / 请选择要练习的棋谱：", font=("Arial", 10, "bold")).pack(pady=10)
         
         listbox = tk.Listbox(selection_window, height=10)
         listbox.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -276,18 +278,18 @@ class GameWindow:
                     self.restart_pattern()
                     selection_window.destroy()
                 else:
-                    messagebox.showerror("错误", "加载棋谱失败！")
+                    messagebox.showerror("Error / 错误", "Failed to load pattern! / 加载棋谱失败！")
         
         button_frame = ttk.Frame(selection_window)
         button_frame.pack(pady=10)
         
-        ttk.Button(button_frame, text="确定", command=on_select).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="取消", command=selection_window.destroy).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="OK / 确定", command=on_select).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Cancel / 取消", command=selection_window.destroy).pack(side=tk.LEFT, padx=5)
     
     def restart_pattern(self):
-        """重新开始当前棋谱"""
+        """重新开始当前棋谱 / Restart current pattern"""
         if not self.pattern_manager.current_pattern:
-            self.add_hint("请先选择一个棋谱！")
+            self.add_hint("Please select a pattern first! / 请先选择一个棋谱！")
             return
         
         self.board.reset()
@@ -296,12 +298,12 @@ class GameWindow:
         self.draw_board()
         self.update_status()
         self.clear_analysis()
-        self.add_hint("棋谱重新开始！你执黑子先手，按照棋谱走法下棋。")
+        self.add_hint("Pattern restarted! You use black stones first, follow pattern moves. / 棋谱重新开始！你执黑子先手，按照棋谱走法下棋。")
     
     def undo_move(self):
         """悔棋 - 撤销最近的一步或两步（玩家+电脑）"""
         if len(self.board.move_history) == 0:
-            self.add_hint("没有可以悔棋的步骤！")
+            self.add_hint("No moves to undo! / 没有可以悔棋的步骤！")
             return
         
         # 如果最后一步是电脑下的，需要撤销两步回到玩家回合
@@ -327,11 +329,11 @@ class GameWindow:
             self.draw_board()
             self.update_status()
             if len(undone_moves) == 1:
-                self.add_hint("已悔棋一步！")
+                self.add_hint("Undid one move! / 已悔棋一步！")
             else:
-                self.add_hint(f"已悔棋{len(undone_moves)}步，回到你的回合！")
+                self.add_hint(f"Undid {len(undone_moves)} moves, back to your turn! / 已悔棋{len(undone_moves)}步，回到你的回合！")
         else:
-            self.add_hint("悔棋失败！")
+            self.add_hint("Undo failed! / 悔棋失败！")
     
     def show_answer(self):
         """显示当前步骤的正确答案"""
@@ -340,13 +342,13 @@ class GameWindow:
             if expected_move:
                 row, col, player = expected_move
                 if player == 1:  # 确保是玩家的回合
-                    self.add_hint(f"提示：你应该下在 {self._format_position(row, col)}")
+                    self.add_hint(f"Hint: You should play at {self._format_position(row, col)} / 提示：你应该下在 {self._format_position(row, col)}")
                 else:
-                    self.add_hint("现在应该轮到电脑下棋！")
+                    self.add_hint("It should be computer's turn now! / 现在应该轮到电脑下棋！")
             else:
-                self.add_hint("棋谱已完成！")
+                self.add_hint("Pattern completed! / 棋谱已完成！")
         else:
-            self.add_hint("现在轮到电脑下棋，请耐心等待！")
+            self.add_hint("Computer's turn, please be patient! / 现在轮到电脑下棋，请耐心等待！")
     
     def update_status(self):
         """更新状态信息"""
@@ -363,15 +365,15 @@ class GameWindow:
         step_text = f"步骤：{pattern_info['current_step']}/{pattern_info['total_moves']}"
         self.step_var.set(step_text)
         
-        # 更新当前状态
+        # 更新当前状态 / Update current status
         if self.pattern_manager.is_pattern_complete():
-            self.status_var.set("棋谱完成！")
+            self.status_var.set("Pattern completed! / 棋谱完成！")
         else:
             if self.validator.is_player_turn():
                 error_info = self.validator.get_error_info()
-                status_text = f"轮到：玩家(黑子) | 错误次数：{error_info['error_count']}/{error_info['max_errors']}"
+                status_text = f"Turn: Player(Black) | Errors: {error_info['error_count']}/{error_info['max_errors']} / 轮到：玩家(黑子) | 错误：{error_info['error_count']}/{error_info['max_errors']}"
             else:
-                status_text = "轮到：电脑(白子) | 正在思考中..."
+                status_text = "Turn: Computer(White) | Thinking... / 轮到：电脑(白子) | 思考中..."
             self.status_var.set(status_text)
     
     def add_hint(self, message):
@@ -387,22 +389,22 @@ class GameWindow:
         
         self.analysis_text.delete(1.0, tk.END)
         
-        # 显示分析内容
-        self.analysis_text.insert(tk.END, f"【开局分析】\n{analysis.get('opening', '')}\n\n")
-        self.analysis_text.insert(tk.END, f"【整体策略】\n{analysis.get('strategy', '')}\n\n")
+        # 显示分析内容 / Display analysis content
+        self.analysis_text.insert(tk.END, f"【Opening Analysis / 开局分析】\n{analysis.get('opening', '')}\n\n")
+        self.analysis_text.insert(tk.END, f"【Overall Strategy / 整体策略】\n{analysis.get('strategy', '')}\n\n")
         
         key_points = analysis.get('key_points', [])
         if key_points:
-            self.analysis_text.insert(tk.END, "【关键步骤】\n")
+            self.analysis_text.insert(tk.END, "【Key Steps / 关键步骤】\n")
             for point in key_points:
                 self.analysis_text.insert(tk.END, f"• {point}\n")
             self.analysis_text.insert(tk.END, "\n")
         
         win_reason = analysis.get('win_reason', '')
         if win_reason:
-            self.analysis_text.insert(tk.END, f"【胜利原理】\n{win_reason}\n")
+            self.analysis_text.insert(tk.END, f"【Victory Principle / 胜利原理】\n{win_reason}\n")
         
-        self.add_hint("棋谱分析已显示在右侧分析区域！")
+        self.add_hint("Pattern analysis displayed in right panel! / 棋谱分析已显示在右侧分析区域！")
     
     def clear_analysis(self):
         """清空分析区域"""

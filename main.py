@@ -1,8 +1,9 @@
 """
-五子棋棋谱练习系统主程序
+Gobang Pattern Battle System Main Program
+五子棋棋谱对战系统主程序
 
-作者：Xu Huicong
-运行此文件启动游戏
+Author / 作者：Xu Huicong
+Run this file to start the game / 运行此文件启动游戏
 """
 
 import sys
@@ -15,16 +16,19 @@ sys.path.insert(0, current_dir)
 try:
     from gui.game_window import GameWindow
 except ImportError as e:
-    print(f"导入错误：{e}")
+    print(f"Import Error / 导入错误：{e}")
+    print("Please ensure all required modules are properly installed.")
     print("请确保所有必需的模块都已正确安装。")
+    print("Run 'pip install -r requirements.txt' to install dependencies.")
     print("运行 'pip install -r requirements.txt' 安装依赖。")
     sys.exit(1)
 
 
 def main():
-    """游戏主函数"""
-    print("正在启动五子棋棋谱练习系统...")
-    print("作者：Xu Huicong")
+    """Main game function / 游戏主函数"""
+    print("Starting Gobang Pattern Battle System...")
+    print("正在启动五子棋棋谱对战系统...")
+    print("Author / 作者：Xu Huicong")
     print("=" * 50)
     
     try:
@@ -32,7 +36,7 @@ def main():
         game = GameWindow()
         game.run()
     except Exception as e:
-        print(f"游戏运行时发生错误：{e}")
+        print(f"Game runtime error / 游戏运行时发生错误：{e}")
         import traceback
         traceback.print_exc()
 

@@ -1,5 +1,7 @@
 """
+Gobang Board Class
 五子棋棋盘类
+Handle board state, piece placement, win/loss judgment and other basic functions
 处理棋盘状态、落子、胜负判断等基础功能
 """
 
@@ -7,14 +9,14 @@ import numpy as np
 
 
 class Board:
-    """五子棋棋盘类"""
+    """Gobang Board Class / 五子棋棋盘类"""
     
     def __init__(self, size=15):
         """
-        初始化棋盘
+        Initialize board / 初始化棋盘
         
         Args:
-            size (int): 棋盘大小，默认15x15
+            size (int): Board size, default 15x15 / 棋盘大小，默认15x15
         """
         self.size = size
         self.board = np.zeros((size, size), dtype=int)  # 0=空, 1=黑子, 2=白子

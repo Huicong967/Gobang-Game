@@ -1,5 +1,7 @@
 """
+Move Validator
 走法验证器
+Validate if player moves comply with pattern requirements, support player vs computer battle mode
 验证玩家的走法是否符合棋谱要求，支持玩家vs电脑对战模式
 """
 
