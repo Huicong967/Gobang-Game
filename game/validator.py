@@ -9,7 +9,7 @@ from typing import Tuple, Optional
 
 
 class MoveValidator:
-    """走法验证器 - 玩家执黑，电脑执白"""
+    """走法验证器 - 残局训练模式（玩家固定执行一种颜色）"""
     
     def __init__(self, pattern_manager, board):
         """
@@ -24,11 +24,13 @@ class MoveValidator:
         self.error_count = 0
         self.max_errors = 3
         self.last_error_move = None
-        self.current_turn = 1  # 1=玩家(黑子), 2=电脑(白子)
+        self.player_color = None  # 玩家固定执行的颜色 (1=黑子, 2=白子)
+        self.computer_color = None  # 电脑固定执行的颜色
+        self.is_player_turn = True  # 当前是否轮到玩家
     
     def validate_player_move(self, row, col):
         """
-        验证玩家走法（玩家始终执黑子）
+        验证玩家走法（玩家在整个残局中固定执行同一种颜色）
         
         Args:
             row (int): 行位置
@@ -41,22 +43,22 @@ class MoveValidator:
                 'correct_move': tuple,   # 正确走法 (row, col, player)
                 'show_answer': bool,     # 是否显示答案
                 'pattern_complete': bool,# 棋谱是否完成
-                'computer_move': tuple   # 电脑的回应走法
+                'computer_move': bool    # 是否需要电脑走棋
             }
         """
-        # 确保当前轮到玩家（黑子）
-        if self.current_turn != 1:
+        # 检查当前是否轮到玩家
+        if not self.is_player_turn:
             return {
                 'valid': False,
-                'message': '现在轮到电脑下棋！',
+                'message': '现在轮到电脑下棋，请等待...',
                 'correct_move': None,
                 'show_answer': False,
                 'pattern_complete': False,
-                'computer_move': None
+                'computer_move': False
             }
         
+        # 获取当前应该下的步骤
         expected_move = self.pattern_manager.get_current_move()
-        
         if not expected_move:
             return {
                 'valid': False,
@@ -64,48 +66,47 @@ class MoveValidator:
                 'correct_move': None,
                 'show_answer': False,
                 'pattern_complete': True,
-                'computer_move': None
+                'computer_move': False
             }
         
-        expected_row, expected_col, expected_player = expected_move
+        expected_row, expected_col, expected_color = expected_move
         
-        # 玩家只能下黑子，检查当前是否应该是黑子
-        if expected_player != 1:
+        # 确保这一步应该是玩家的颜色
+        if expected_color != self.player_color:
             return {
                 'valid': False,
-                'message': '现在轮到电脑下棋！',
+                'message': '现在轮到电脑下棋，请等待...',
                 'correct_move': None,
                 'show_answer': False,
                 'pattern_complete': False,
-                'computer_move': None
+                'computer_move': False
             }
         
-        # 检查玩家走法是否与期望的黑子走法匹配
+        # 检查玩家走法是否正确
         if row == expected_row and col == expected_col:
             # 走法正确
             self.error_count = 0  # 重置错误计数
             self.last_error_move = None
             self.pattern_manager.advance_step()
-            self.current_turn = 2  # 轮到电脑
             
-            # 获取电脑的回应（下一步白子）
-            computer_move = self.pattern_manager.get_current_move()
+            # 切换到电脑回合
+            self.is_player_turn = False
             
             # 检查棋谱是否完成
             pattern_complete = self.pattern_manager.is_pattern_complete()
             
             return {
                 'valid': True,
-                'message': '走法正确！电脑回应中...',
+                'message': '走法正确！' if pattern_complete else '走法正确！电脑思考中...',
                 'correct_move': expected_move,
                 'show_answer': False,
                 'pattern_complete': pattern_complete,
-                'computer_move': computer_move
+                'computer_move': not pattern_complete  # 如果未完成则需要电脑走棋
             }
         else:
             # 走法错误
             self.error_count += 1
-            self.last_error_move = (row, col, 1)
+            self.last_error_move = (row, col, self.player_color)
             
             if self.error_count >= self.max_errors:
                 # 达到最大错误次数，显示正确答案
@@ -115,7 +116,7 @@ class MoveValidator:
                     'correct_move': expected_move,
                     'show_answer': True,
                     'pattern_complete': False,
-                    'computer_move': None
+                    'computer_move': False
                 }
             else:
                 # 还有重试机会
@@ -125,7 +126,7 @@ class MoveValidator:
                     'correct_move': expected_move,
                     'show_answer': False,
                     'pattern_complete': False,
-                    'computer_move': None
+                    'computer_move': False
                 }
     
     def _format_position(self, row, col):
@@ -179,7 +180,7 @@ class MoveValidator:
     
     def make_computer_move(self):
         """
-        电脑自动下棋（执白子）
+        电脑自动下棋（执行固定颜色）
         
         Returns:
             dict: {
@@ -188,13 +189,14 @@ class MoveValidator:
                 'pattern_complete': bool # 棋谱是否完成
             }
         """
-        if self.current_turn != 2:
+        # 检查是否轮到电脑
+        if self.is_player_turn:
             return {
                 'move': None,
                 'message': '现在轮到玩家下棋！',
                 'pattern_complete': False
             }
-        
+            
         expected_move = self.pattern_manager.get_current_move()
         
         if not expected_move:
@@ -203,32 +205,33 @@ class MoveValidator:
                 'message': '棋谱已完成！',
                 'pattern_complete': True
             }
+            
+        expected_row, expected_col, expected_color = expected_move
         
-        expected_row, expected_col, expected_player = expected_move
-        
-        # 检查是否是电脑的回合（白子）
-        if expected_player != 2:
+        # 确保这一步应该是电脑的颜色
+        if expected_color != self.computer_color:
             return {
                 'move': None,
-                'message': '棋谱顺序错误！',
+                'message': '现在轮到玩家下棋！',
                 'pattern_complete': False
             }
         
-        # 电脑执行走法
-        if self.board.make_move(expected_row, expected_col, expected_player):
+        # 电脑执行走法（使用固定的电脑颜色）
+        if self.board.make_move(expected_row, expected_col, self.computer_color):
             self.pattern_manager.advance_step()
-            self.current_turn = 1  # 轮到玩家
+            # 切换到玩家回合
+            self.is_player_turn = True
             
             # 检查棋谱是否完成
             pattern_complete = self.pattern_manager.is_pattern_complete()
             
             if pattern_complete:
-                message = '棋谱完成！电脑获胜！'
+                message = '棋谱完成！'
             else:
                 message = '电脑已下棋，轮到你了！'
             
             return {
-                'move': expected_move,
+                'move': (expected_row, expected_col, self.computer_color),
                 'message': message,
                 'pattern_complete': pattern_complete
             }
@@ -249,16 +252,15 @@ class MoveValidator:
         expected_move = self.pattern_manager.get_current_move()
         
         if expected_move:
-            row, col, player = expected_move
-            if self.board.make_move(row, col, player):
+            row, col, expected_color = expected_move
+            # 根据期望颜色决定使用哪个玩家的颜色
+            actual_color = expected_color  # 保持原有的颜色
+            if self.board.make_move(row, col, actual_color):
                 self.pattern_manager.advance_step()
                 self.error_count = 0  # 重置错误计数
                 # 切换回合
-                if player == 1:
-                    self.current_turn = 2
-                else:
-                    self.current_turn = 1
-                return expected_move
+                self.is_player_turn = not self.is_player_turn
+                return (row, col, actual_color)
         
         return None
     
@@ -267,11 +269,34 @@ class MoveValidator:
         self.error_count = 0
         self.last_error_move = None
     
+    def initialize_player_colors(self):
+        """初始化玩家和电脑的固定颜色"""
+        if self.pattern_manager.current_pattern:
+            first_move = self.pattern_manager.get_current_move()
+            if first_move:
+                first_color = first_move[2]
+                # 玩家执白子（2），电脑执黑子（1）
+                self.player_color = 2  # 白子
+                self.computer_color = 1  # 黑子
+                # 判断第一手是玩家还是电脑
+                self.is_player_turn = (first_color == self.player_color)
+            else:
+                # 默认设置：玩家白子先手
+                self.player_color = 2
+                self.computer_color = 1
+                self.is_player_turn = True
+        else:
+            # 默认设置：玩家白子先手
+            self.player_color = 2
+            self.computer_color = 1
+            self.is_player_turn = True
+    
     def reset_game(self):
         """重置游戏状态"""
         self.error_count = 0
         self.last_error_move = None
-        self.current_turn = 1  # 玩家先手（黑子）
+        # 重新初始化玩家颜色
+        self.initialize_player_colors()
     
     def get_error_info(self):
         """
@@ -292,7 +317,7 @@ class MoveValidator:
         获取当前应该下棋的玩家
         
         Returns:
-            int: 当前玩家 (1=黑子玩家, 2=白子电脑) 或 None
+            int: 当前玩家 (2=白子玩家, 1=黑子电脑) 或 None
         """
         return self.current_turn
     
@@ -303,7 +328,11 @@ class MoveValidator:
         Returns:
             bool: 是否轮到玩家
         """
-        return self.current_turn == 1
+        # 动态判断：根据当前期望走法确定是否轮到玩家
+        expected_move = self.pattern_manager.get_current_move()
+        if expected_move:
+            return self.current_turn == expected_move[2]
+        return False
     
     def is_computer_turn(self):
         """
@@ -312,4 +341,8 @@ class MoveValidator:
         Returns:
             bool: 是否轮到电脑
         """
-        return self.current_turn == 2
+        # 动态判断：根据当前期望走法确定是否轮到电脑
+        expected_move = self.pattern_manager.get_current_move()
+        if expected_move:
+            return self.current_turn == expected_move[2] and not self.is_player_turn()
+        return False

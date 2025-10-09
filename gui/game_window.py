@@ -22,7 +22,7 @@ class GameWindow:
     def __init__(self):
         """初始化游戏窗口"""
         self.root = tk.Tk()
-        self.root.title("Gobang Pattern Battle - Player vs Computer - by Xu Huicong / 五子棋棋谱对战系统 - 玩家vs电脑")
+        self.root.title("Gobang Endgame Training System - by Xu Huicong / 五子棋残局训练系统 - 徐慧聪制作")
         self.root.geometry("1000x700")
         self.root.resizable(False, False)
         
@@ -76,12 +76,12 @@ class GameWindow:
         info_frame.grid(row=0, column=1, sticky="nsew")
         
         # 棋谱信息 / Pattern information
-        self.pattern_info_var = tk.StringVar(value="Please select a pattern to start battle / 请选择棋谱开始对战练习")
+        self.pattern_info_var = tk.StringVar(value="Please select an endgame pattern to practice / 请选择残局棋谱进行练习")
         pattern_info_label = ttk.Label(info_frame, textvariable=self.pattern_info_var, font=("Arial", 10, "bold"))
         pattern_info_label.pack(anchor="w", pady=(0, 10))
         
-        # 当前状态 / Current status
-        self.status_var = tk.StringVar(value="You use black stones, computer uses white / 你执黑子，电脑执白子")
+        # 当前状态 / Current status  
+        self.status_var = tk.StringVar(value="Please select an endgame pattern / 请选择残局棋谱")
         status_label = ttk.Label(info_frame, textvariable=self.status_var, font=("Arial", 9))
         status_label.pack(anchor="w", pady=(0, 10))
         
@@ -186,20 +186,23 @@ class GameWindow:
         
         # 检查是否已选择棋谱 / Check if pattern is selected
         if not self.pattern_manager.current_pattern:
-            self.add_hint("Please select a pattern first! / 请先选择一个棋谱进行练习！")
+            self.add_hint("Please select an endgame pattern first! / 请先选择一个残局棋谱进行练习！")
             return
         
         # 检查是否轮到玩家 / Check if it's player's turn
-        if not self.validator.is_player_turn():
+        if not self.validator.is_player_turn:
             self.add_hint("Computer's turn, please wait... / 现在轮到电脑下棋，请等待...")
             return
         
-        # 验证玩家走法（玩家执黑子）
+        # 验证玩家走法（动态确定玩家颜色）
         result = self.validator.validate_player_move(row, col)
         
         if result['valid']:
-            # 玩家走法正确，落子
-            self.board.make_move(row, col, 1)  # 玩家执黑子
+            # 玩家走法正确，落子（颜色由验证器中的正确走法确定）
+            correct_move = result['correct_move']
+            if correct_move:
+                self.board.make_move(row, col, correct_move[2])
+            
             self.draw_stones()
             self.add_hint(result['message'])
             self.update_status()
@@ -240,12 +243,17 @@ class GameWindow:
         correct_move = self.validator.auto_make_correct_move()
         if correct_move:
             self.draw_stones()
-            player_name = "玩家" if correct_move[2] == 1 else "电脑"
+            # 动态确定玩家和电脑
+            expected_move = self.pattern_manager.get_current_move()
+            if expected_move and expected_move[2] == correct_move[2]:
+                player_name = "玩家"
+            else:
+                player_name = "电脑"
             self.add_hint(f"系统演示：{player_name}正确走法 {self._format_move(correct_move)}")
             self.update_status()
             
             # 如果刚才是玩家的走法，现在轮到电脑
-            if correct_move[2] == 1 and self.validator.is_computer_turn():
+            if player_name == "玩家" and self.validator.is_computer_turn():
                 self.root.after(1500, self.make_computer_move)
     
     def show_pattern_selection(self):
@@ -260,7 +268,7 @@ class GameWindow:
         selection_window.grab_set()
         
         # 棋谱列表 / Pattern list
-        ttk.Label(selection_window, text="Please select a pattern for practice / 请选择要练习的棋谱：", font=("Arial", 10, "bold")).pack(pady=10)
+        ttk.Label(selection_window, text="Please select an endgame pattern for practice / 请选择要练习的残局棋谱：", font=("Arial", 10, "bold")).pack(pady=10)
         
         listbox = tk.Listbox(selection_window, height=10)
         listbox.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -295,10 +303,22 @@ class GameWindow:
         self.board.reset()
         self.pattern_manager.reset_pattern()
         self.validator.reset_game()
+        
+        # 设置残局初始局面
+        self.setup_endgame_initial_position()
+        
+        # 初始化固定的玩家和电脑颜色
+        self.validator.initialize_player_colors()
+        
+        # 显示玩家执子颜色提示
+        if self.validator.player_color == 1:
+            self.add_hint("Endgame restarted! You use BLACK stones, computer uses WHITE. / 残局重新开始！你执黑子，电脑执白子。")
+        else:
+            self.add_hint("Endgame restarted! You use WHITE stones, computer uses BLACK. / 残局重新开始！你执白子，电脑执黑子。")
+        
         self.draw_board()
         self.update_status()
         self.clear_analysis()
-        self.add_hint("Pattern restarted! You use black stones first, follow pattern moves. / 棋谱重新开始！你执黑子先手，按照棋谱走法下棋。")
     
     def undo_move(self):
         """悔棋 - 撤销最近的一步或两步（玩家+电脑）"""
@@ -310,7 +330,10 @@ class GameWindow:
         moves_to_undo = 1
         if len(self.board.move_history) > 0:
             last_move = self.board.move_history[-1]
-            if last_move[2] == 2:  # 最后一步是电脑(白子)
+            # 动态判断最后一步是否是电脑下的
+            expected_move = self.pattern_manager.get_current_move()
+            is_computer_last = expected_move and last_move[2] != expected_move[2]
+            if is_computer_last:  # 最后一步是电脑下的
                 moves_to_undo = 2
         
         # 执行悔棋
@@ -325,7 +348,11 @@ class GameWindow:
         
         if undone_moves:
             self.validator.reset_errors()
-            self.validator.current_turn = 1  # 确保轮到玩家
+            # 确保轮到玩家（根据棋谱动态确定）
+            if self.pattern_manager.current_pattern:
+                first_move = self.pattern_manager.get_current_move()
+                if first_move:
+                    self.validator.current_turn = first_move[2]
             self.draw_board()
             self.update_status()
             if len(undone_moves) == 1:
@@ -337,11 +364,11 @@ class GameWindow:
     
     def show_answer(self):
         """显示当前步骤的正确答案"""
-        if self.validator.is_player_turn():
+        if self.validator.is_player_turn:
             expected_move = self.pattern_manager.get_current_move()
             if expected_move:
                 row, col, player = expected_move
-                if player == 1:  # 确保是玩家的回合
+                if self.validator.is_player_turn:  # 动态判断是否玩家回合
                     self.add_hint(f"Hint: You should play at {self._format_position(row, col)} / 提示：你应该下在 {self._format_position(row, col)}")
                 else:
                     self.add_hint("It should be computer's turn now! / 现在应该轮到电脑下棋！")
@@ -369,11 +396,18 @@ class GameWindow:
         if self.pattern_manager.is_pattern_complete():
             self.status_var.set("Pattern completed! / 棋谱完成！")
         else:
-            if self.validator.is_player_turn():
+            if self.validator.is_player_turn:
                 error_info = self.validator.get_error_info()
-                status_text = f"Turn: Player(Black) | Errors: {error_info['error_count']}/{error_info['max_errors']} / 轮到：玩家(黑子) | 错误：{error_info['error_count']}/{error_info['max_errors']}"
+                # 动态确定玩家颜色
+                expected_move = self.pattern_manager.get_current_move()
+                if expected_move:
+                    player_color = "Black" if expected_move[2] == 1 else "White" 
+                    player_color_cn = "黑子" if expected_move[2] == 1 else "白子"
+                    status_text = f"Turn: Player({player_color}) | Errors: {error_info['error_count']}/{error_info['max_errors']} / 轮到：玩家({player_color_cn}) | 错误：{error_info['error_count']}/{error_info['max_errors']}"
+                else:
+                    status_text = "Your turn / 轮到你了"
             else:
-                status_text = "Turn: Computer(White) | Thinking... / 轮到：电脑(白子) | 思考中..."
+                status_text = "Computer's turn | Thinking... / 轮到电脑 | 思考中..."
             self.status_var.set(status_text)
     
     def add_hint(self, message):
@@ -409,6 +443,21 @@ class GameWindow:
     def clear_analysis(self):
         """清空分析区域"""
         self.analysis_text.delete(1.0, tk.END)
+    
+    def setup_endgame_initial_position(self):
+        """设置残局初始局面"""
+        if not self.pattern_manager.current_pattern:
+            return
+        
+        # 获取初始局面设置
+        initial_setup = self.pattern_manager.current_pattern.get('initial_setup', [])
+        
+        # 在棋盘上放置初始棋子
+        for row, col, player in initial_setup:
+            self.board.make_move(row, col, player)
+        
+        # 重新绘制棋盘
+        self.draw_stones()
     
     def _format_move(self, move):
         """格式化走法"""
