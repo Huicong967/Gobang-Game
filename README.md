@@ -26,8 +26,8 @@
 
 1. 克隆项目到本地：
 ```bash
-git clone https://github.com/XuHuicong/gobang-pattern-practice.git
-cd gobang-pattern-practice
+git clone https://github.com/XuHuicong/Gobang-Game.git
+cd Gobang-Game
 ```
 
 2. 安装依赖：
