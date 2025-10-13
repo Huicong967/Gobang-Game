@@ -216,8 +216,8 @@ class MoveValidator:
                 'pattern_complete': False
             }
         
-        # 电脑执行走法（使用固定的电脑颜色）
-        if self.board.make_move(expected_row, expected_col, self.computer_color):
+        # 电脑执行走法（使用棋谱中期望的颜色）
+        if self.board.make_move(expected_row, expected_col, expected_color):
             self.pattern_manager.advance_step()
             # 切换到玩家回合
             self.is_player_turn = True
@@ -231,7 +231,7 @@ class MoveValidator:
                 message = '电脑已下棋，轮到你了！'
             
             return {
-                'move': (expected_row, expected_col, self.computer_color),
+                'move': (expected_row, expected_col, expected_color),
                 'message': message,
                 'pattern_complete': pattern_complete
             }
@@ -258,8 +258,15 @@ class MoveValidator:
             if self.board.make_move(row, col, actual_color):
                 self.pattern_manager.advance_step()
                 self.error_count = 0  # 重置错误计数
-                # 切换回合
-                self.is_player_turn = not self.is_player_turn
+                
+                # 正确处理回合切换：如果刚才是玩家的走法，现在轮到电脑；反之亦然
+                if expected_color == self.player_color:
+                    # 刚才是玩家走法，现在轮到电脑
+                    self.is_player_turn = False
+                else:
+                    # 刚才是电脑走法，现在轮到玩家
+                    self.is_player_turn = True
+                    
                 return (row, col, actual_color)
         
         return None
@@ -271,24 +278,21 @@ class MoveValidator:
     
     def initialize_player_colors(self):
         """初始化玩家和电脑的固定颜色"""
+        # 根据棋谱设计：玩家执白子（2），电脑执黑子（1）
+        self.player_color = 2  # 白子
+        self.computer_color = 1  # 黑子
+        
         if self.pattern_manager.current_pattern:
             first_move = self.pattern_manager.get_current_move()
             if first_move:
                 first_color = first_move[2]
-                # 玩家执白子（2），电脑执黑子（1）
-                self.player_color = 2  # 白子
-                self.computer_color = 1  # 黑子
                 # 判断第一手是玩家还是电脑
                 self.is_player_turn = (first_color == self.player_color)
             else:
-                # 默认设置：玩家白子先手
-                self.player_color = 2
-                self.computer_color = 1
+                # 如果没有走法，默认玩家先手
                 self.is_player_turn = True
         else:
-            # 默认设置：玩家白子先手
-            self.player_color = 2
-            self.computer_color = 1
+            # 默认玩家先手
             self.is_player_turn = True
     
     def reset_game(self):

@@ -207,6 +207,7 @@ class GameWindow:
                 self.show_pattern_analysis()
             elif result.get('computer_move', False):
                 # 延迟一点时间让玩家看到自己的走法，然后电脑走棋
+                self.add_hint(f"DEBUG: 即将电脑走棋，当前is_player_turn={self.validator.is_player_turn}")
                 self.root.after(800, self.make_computer_move)
         else:
             self.add_hint(result['message'])
@@ -215,10 +216,13 @@ class GameWindow:
     
     def make_computer_move(self):
         """电脑自动下棋"""
+        self.add_hint(f"DEBUG: make_computer_move被调用，is_player_turn={self.validator.is_player_turn}")
         if not self.validator.is_computer_turn():
+            self.add_hint(f"DEBUG: 不是电脑回合，退出")
             return
         
         result = self.validator.make_computer_move()
+        self.add_hint(f"DEBUG: 电脑走棋结果={result}")
         
         if result['move']:
             row, col, player = result['move']
@@ -236,18 +240,17 @@ class GameWindow:
         correct_move = self.validator.auto_make_correct_move()
         if correct_move:
             self.draw_stones()
-            # 动态确定玩家和电脑
-            expected_move = self.pattern_manager.get_current_move()
-            if expected_move and expected_move[2] == correct_move[2]:
-                player_name = "玩家"
-            else:
-                player_name = "电脑"
-            self.add_hint(f"系统演示：{player_name}正确走法 {self._format_move(correct_move)}")
+            # 显示正确走法
+            self.add_hint(f"系统演示：正确走法 {self._format_move(correct_move)}")
             self.update_status()
             
-            # 如果刚才是玩家的走法，现在轮到电脑
-            if player_name == "玩家" and self.validator.is_computer_turn():
-                self.root.after(1500, self.make_computer_move)
+            # 检查棋谱是否完成
+            if self.pattern_manager.is_pattern_complete():
+                self.show_pattern_analysis()
+            else:
+                # 如果还没完成，继续下一步，可能需要电脑走棋
+                if self.validator.is_computer_turn():
+                    self.root.after(1500, self.make_computer_move)
     
     def show_pattern_selection(self):
         """显示棋谱选择对话框"""
