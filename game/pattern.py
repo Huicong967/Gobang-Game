@@ -39,6 +39,14 @@ class PatternManager:
         """加载可用的棋谱列表"""
         self.patterns_list = []
         
+        # 一手胜题目 (只保留三个初级棋谱)
+        for i in range(1, 4):
+            self.patterns_list.append({
+                "id": f"one_move_{i}",
+                "name": f"One Move Victory #{i} / 一手胜 第{i}题",
+                "difficulty": "Beginner / 初级",
+                "description": f"Find the winning move in one step / 一手制胜第{i}题"
+            })
         
         # 两手胜题目 (31-35)  
         for i in range(31, 36):

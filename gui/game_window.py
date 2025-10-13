@@ -207,7 +207,6 @@ class GameWindow:
                 self.show_pattern_analysis()
             elif result.get('computer_move', False):
                 # 延迟一点时间让玩家看到自己的走法，然后电脑走棋
-                self.add_hint(f"DEBUG: 即将电脑走棋，当前is_player_turn={self.validator.is_player_turn}")
                 self.root.after(800, self.make_computer_move)
         else:
             self.add_hint(result['message'])
@@ -216,13 +215,10 @@ class GameWindow:
     
     def make_computer_move(self):
         """电脑自动下棋"""
-        self.add_hint(f"DEBUG: make_computer_move被调用，is_player_turn={self.validator.is_player_turn}")
         if not self.validator.is_computer_turn():
-            self.add_hint(f"DEBUG: 不是电脑回合，退出")
             return
         
         result = self.validator.make_computer_move()
-        self.add_hint(f"DEBUG: 电脑走棋结果={result}")
         
         if result['move']:
             row, col, player = result['move']
@@ -307,10 +303,7 @@ class GameWindow:
         self.validator.initialize_player_colors()
         
         # 显示玩家执子颜色提示
-        if self.validator.player_color == 1:
-            self.add_hint("Endgame restarted! You use BLACK stones, computer uses WHITE. / 残局重新开始！你执黑子，电脑执白子。")
-        else:
-            self.add_hint("Endgame restarted! You use WHITE stones, computer uses BLACK. / 残局重新开始！你执白子，电脑执黑子。")
+        self.add_hint("Endgame restarted! You use WHITE stones, computer uses BLACK. / 残局重新开始！你执白子，电脑执黑子。")
         
         self.draw_board()
         self.update_status()
@@ -392,14 +385,7 @@ class GameWindow:
         else:
             if self.validator.is_player_turn:
                 error_info = self.validator.get_error_info()
-                # 动态确定玩家颜色
-                expected_move = self.pattern_manager.get_current_move()
-                if expected_move:
-                    player_color = "Black" if expected_move[2] == 1 else "White" 
-                    player_color_cn = "黑子" if expected_move[2] == 1 else "白子"
-                    status_text = f"Turn: Player({player_color}) | Errors: {error_info['error_count']}/{error_info['max_errors']} / 轮到：玩家({player_color_cn}) | 错误：{error_info['error_count']}/{error_info['max_errors']}"
-                else:
-                    status_text = "Your turn / 轮到你了"
+                status_text = f"Turn: Player(White) | Errors: {error_info['error_count']}/{error_info['max_errors']} / 轮到：玩家(白子) | 错误：{error_info['error_count']}/{error_info['max_errors']}"
             else:
                 status_text = "Computer's turn | Thinking... / 轮到电脑 | 思考中..."
             self.status_var.set(status_text)

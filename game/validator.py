@@ -316,24 +316,7 @@ class MoveValidator:
             'last_error_move': self.last_error_move
         }
     
-    def get_current_player(self):
-        """
-        获取当前应该下棋的玩家
-        
-        Returns:
-            int: 当前玩家 (2=白子玩家, 1=黑子电脑) 或 None
-        """
-        return self.current_turn
-    
-    def is_player_turn_method(self):
-        """
-        检查是否轮到玩家
-        
-        Returns:
-            bool: 是否轮到玩家
-        """
-        # 使用实例属性判断是否轮到玩家
-        return self.is_player_turn
+
     
     def is_computer_turn(self):
         """
