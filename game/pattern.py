@@ -1,11 +1,4 @@
-"""
-Pattern Manager
-棋谱管理器
-Handle pattern loading, parsing and management
-处理棋谱的加载、解析和管理
-"""
 
-import json
 import os
 from typing import List, Dict, Tuple, Optional
 
@@ -46,14 +39,6 @@ class PatternManager:
         """加载可用的棋谱列表"""
         self.patterns_list = []
         
-        # 一手胜题目 (1-30)
-        for i in range(1, 31):
-            self.patterns_list.append({
-                "id": f"one_move_{i}",
-                "name": f"One Move Victory #{i} / 一手胜 第{i}题",
-                "difficulty": "Beginner / 初级",
-                "description": f"Find the winning move in one step / 一手制胜第{i}题"
-            })
         
         # 两手胜题目 (31-35)  
         for i in range(31, 36):
@@ -75,10 +60,10 @@ class PatternManager:
     
     def get_patterns_list(self):
         """
-        获取棋谱列表
+        获取棋谱信息
         
         Returns:
-            list: 棋谱信息列表
+            dict: 棋谱信息
         """
         return self.patterns_list
     
@@ -335,7 +320,7 @@ class PatternManager:
         获取当前步骤的走法
         
         Returns:
-            tuple: (row, col, player) 或 None
+            tuple: (row, col, player) or None
         """
         if not self.current_pattern or self.current_step >= len(self.current_pattern["moves"]):
             return None
@@ -344,10 +329,10 @@ class PatternManager:
     
     def get_next_move(self):
         """
-        获取下一步的走法（不移动步骤指针）
+        获取下一步的走法(不移动步骤指针)
         
         Returns:
-            tuple: (row, col, player) 或 None
+            tuple: (row, col, player) or None
         """
         if not self.current_pattern or (self.current_step + 1) >= len(self.current_pattern["moves"]):
             return None

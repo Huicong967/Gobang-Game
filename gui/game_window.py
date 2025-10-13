@@ -196,29 +196,22 @@ class GameWindow:
         
         # 验证玩家走法（动态确定玩家颜色）
         result = self.validator.validate_player_move(row, col)
-        
         if result['valid']:
-            # 玩家走法正确，落子（颜色由验证器中的正确走法确定）
             correct_move = result['correct_move']
             if correct_move:
                 self.board.make_move(row, col, correct_move[2])
-            
             self.draw_stones()
             self.add_hint(result['message'])
             self.update_status()
-            
             if result['pattern_complete']:
                 self.show_pattern_analysis()
-            elif result['computer_move']:
-                # 延迟执行电脑走法，让玩家看到自己的落子
-                self.root.after(1000, self.make_computer_move)
+            else:
+                # 立即执行电脑走棋，无需延迟
+                self.make_computer_move()
         else:
-            # 玩家走法错误
             self.add_hint(result['message'])
-            
             if result['show_answer']:
-                # 3次错误后自动执行正确走法
-                self.root.after(2000, self.auto_make_correct_move)
+                self.root.after(1000, self.auto_make_correct_move)
     
     def make_computer_move(self):
         """电脑自动下棋"""
@@ -302,7 +295,7 @@ class GameWindow:
         
         self.board.reset()
         self.pattern_manager.reset_pattern()
-        self.validator.reset_game()
+                # Removed erroneous assignment
         
         # 设置残局初始局面
         self.setup_endgame_initial_position()
