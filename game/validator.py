@@ -321,18 +321,15 @@ class MoveValidator:
         """
         return self.current_turn
     
-    def is_player_turn(self):
+    def is_player_turn_method(self):
         """
         检查是否轮到玩家
         
         Returns:
             bool: 是否轮到玩家
         """
-        # 动态判断：根据当前期望走法确定是否轮到玩家
-        expected_move = self.pattern_manager.get_current_move()
-        if expected_move:
-            return self.current_turn == expected_move[2]
-        return False
+        # 使用实例属性判断是否轮到玩家
+        return self.is_player_turn
     
     def is_computer_turn(self):
         """
@@ -341,8 +338,5 @@ class MoveValidator:
         Returns:
             bool: 是否轮到电脑
         """
-        # 动态判断：根据当前期望走法确定是否轮到电脑
-        expected_move = self.pattern_manager.get_current_move()
-        if expected_move:
-            return self.current_turn == expected_move[2] and not self.is_player_turn()
-        return False
+        # 使用实例属性判断是否轮到电脑
+        return not self.is_player_turn

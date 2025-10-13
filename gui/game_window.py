@@ -205,9 +205,9 @@ class GameWindow:
             self.update_status()
             if result['pattern_complete']:
                 self.show_pattern_analysis()
-            else:
-                # 立即执行电脑走棋，无需延迟
-                self.make_computer_move()
+            elif result.get('computer_move', False):
+                # 延迟一点时间让玩家看到自己的走法，然后电脑走棋
+                self.root.after(800, self.make_computer_move)
         else:
             self.add_hint(result['message'])
             if result['show_answer']:
@@ -295,7 +295,7 @@ class GameWindow:
         
         self.board.reset()
         self.pattern_manager.reset_pattern()
-                # Removed erroneous assignment
+        self.validator.reset_game()
         
         # 设置残局初始局面
         self.setup_endgame_initial_position()
@@ -343,9 +343,10 @@ class GameWindow:
             self.validator.reset_errors()
             # 确保轮到玩家（根据棋谱动态确定）
             if self.pattern_manager.current_pattern:
-                first_move = self.pattern_manager.get_current_move()
-                if first_move:
-                    self.validator.current_turn = first_move[2]
+                current_move = self.pattern_manager.get_current_move()
+                if current_move:
+                    # 根据当前应该下的棋子颜色判断轮到谁
+                    self.validator.is_player_turn = (current_move[2] == self.validator.player_color)
             self.draw_board()
             self.update_status()
             if len(undone_moves) == 1:
@@ -361,10 +362,7 @@ class GameWindow:
             expected_move = self.pattern_manager.get_current_move()
             if expected_move:
                 row, col, player = expected_move
-                if self.validator.is_player_turn:  # 动态判断是否玩家回合
-                    self.add_hint(f"Hint: You should play at {self._format_position(row, col)} / 提示：你应该下在 {self._format_position(row, col)}")
-                else:
-                    self.add_hint("It should be computer's turn now! / 现在应该轮到电脑下棋！")
+                self.add_hint(f"Hint: You should play at {self._format_position(row, col)} / 提示：你应该下在 {self._format_position(row, col)}")
             else:
                 self.add_hint("Pattern completed! / 棋谱已完成！")
         else:
