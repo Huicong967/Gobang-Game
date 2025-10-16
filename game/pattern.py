@@ -223,8 +223,12 @@ class PatternManager:
                 "moves": move_sequence,
                 "analysis": {
                     "opening": description,
-                    "strategy": "观察残局局面，找出制胜的关键一手",
-                    "key_points": ["分析当前棋型", "寻找突破点", "一手制胜"],
+                    "strategy": "Observe the endgame position and find the key winning move / 观察残局局面，找出制胜的关键一手",
+                    "key_points": [
+                        "Analyze current pattern / 分析当前棋型", 
+                        "Find breakthrough point / 寻找突破点", 
+                        "One move victory / 一手制胜"
+                    ],
                     "win_reason": analysis
                 }
             }
@@ -270,8 +274,13 @@ class PatternManager:
                 "moves": move_sequence,
                 "analysis": {
                     "opening": description,
-                    "strategy": "通过连续两手棋的配合，形成冲四战术，迫使对手防守后完成制胜",
-                    "key_points": ["观察棋形", "找出冲四点", "计算后续连击", "完成制胜"],
+                    "strategy": "Through cooperation of two consecutive moves, form threat-four tactics to force opponent defense then complete victory / 通过连续两手棋的配合，形成冲四战术，迫使对手防守后完成制胜",
+                    "key_points": [
+                        "Observe pattern / 观察棋形", 
+                        "Find threat-four point / 找出冲四点", 
+                        "Calculate follow-up attacks / 计算后续连击", 
+                        "Complete victory / 完成制胜"
+                    ],
                     "win_reason": analysis
                 }
             }        # 三手胜题目 (91-95) - 修正为7手初始局面，更合理的棋子分布
@@ -315,8 +324,14 @@ class PatternManager:
                 "moves": move_sequence,
                 "analysis": {
                     "opening": description,
-                    "strategy": "通过三手棋的精密配合，连续冲四形成多重威胁，迫使对手疲于防守最终获胜",
-                    "key_points": ["第一步冲四", "第二步威胁", "第三步制胜", "连续计算", "双重威胁"],
+                    "strategy": "Through precise cooperation of three moves, create continuous threat-fours forming multiple threats, forcing opponent into exhaustive defense then achieving victory / 通过三手棋的精密配合，连续冲四形成多重威胁，迫使对手疲于防守最终获胜",
+                    "key_points": [
+                        "First move: Threat-four / 第一步冲四", 
+                        "Second move: New threat / 第二步威胁", 
+                        "Third move: Victory / 第三步制胜", 
+                        "Continuous calculation / 连续计算", 
+                        "Double threat / 双重威胁"
+                    ],
                     "win_reason": analysis
                 }
             }

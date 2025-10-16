@@ -50,7 +50,7 @@ class GameWindow:
         main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
         # 左侧 - 游戏区域 / Left side - Game area
-        game_frame = ttk.LabelFrame(main_frame, text="Board / 棋盘", padding="10")
+        game_frame = ttk.LabelFrame(main_frame, text="Game Board / 游戏棋盘", padding="10")
         game_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
         
         # 棋盘画布
@@ -72,7 +72,7 @@ class GameWindow:
         ttk.Button(control_frame, text="Show Answer / 显示答案", command=self.show_answer).pack(side=tk.LEFT, padx=5)
         
         # 右侧 - 信息区域 / Right side - Information area
-        info_frame = ttk.LabelFrame(main_frame, text="Game Info / 游戏信息", padding="10")
+        info_frame = ttk.LabelFrame(main_frame, text="Game Information / 游戏信息", padding="10")
         info_frame.grid(row=0, column=1, sticky="nsew")
         
         # 棋谱信息 / Pattern information
@@ -237,7 +237,7 @@ class GameWindow:
         if correct_move:
             self.draw_stones()
             # 显示正确走法
-            self.add_hint(f"系统演示：正确走法 {self._format_move(correct_move)}")
+            self.add_hint(f"System demo: Correct move {self._format_move(correct_move)} / 系统演示：正确走法 {self._format_move(correct_move)}")
             self.update_status()
             
             # 检查棋谱是否完成
@@ -372,11 +372,11 @@ class GameWindow:
         pattern_info = self.pattern_manager.get_pattern_info()
         
         # 更新棋谱信息
-        info_text = f"棋谱：{pattern_info['name']} ({pattern_info['difficulty']})"
+        info_text = f"Pattern / 棋谱：{pattern_info['name']} ({pattern_info['difficulty']})"
         self.pattern_info_var.set(info_text)
         
         # 更新步骤信息
-        step_text = f"步骤：{pattern_info['current_step']}/{pattern_info['total_moves']}"
+        step_text = f"Steps / 步骤：{pattern_info['current_step']}/{pattern_info['total_moves']}"
         self.step_var.set(step_text)
         
         # 更新当前状态 / Update current status
