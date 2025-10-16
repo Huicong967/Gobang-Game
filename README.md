@@ -3,6 +3,10 @@
 ![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
+![AI-Assisted](https://img.shields.io/badge/Development-AI--Assisted-purple.svg)
+
+**🤖 AI-Assisted Development / AI辅助开发**
+This project was developed with the assistance of AI coding agents. / 本项目由AI代理辅助编码完成。
 
 A player vs computer Gobang pattern battle system. Players use black stones, computer uses white stones, battle according to classic patterns to help players learn Gobang tactics and opening strategies.
 
@@ -106,9 +110,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author / 作者
 
-- **Xu Huicong** - Project creator and sole developer / 项目创建者和唯一开发者
+- **Xu Huicong** - Project creator and primary developer / 项目创建者和主要开发者
+- **AI Coding Agents** - Technical implementation assistance / 技术实现辅助
 - GitHub: [@Huicong967](https://github.com/Huicong967)
+
+## AI Development Details / AI开发详情
+
+This project demonstrates effective human-AI collaboration in software development:
+- **Human Direction**: Project vision, game rules, and user experience design / 人类指导：项目愿景、游戏规则和用户体验设计
+- **AI Implementation**: Code architecture, technical implementation, and optimization / AI实现：代码架构、技术实现和优化
+
+For detailed information about the AI-assisted development process, see [`AI_DEVELOPMENT_ACKNOWLEDGMENT.md`](AI_DEVELOPMENT_ACKNOWLEDGMENT.md).
+
+有关AI辅助开发过程的详细信息，请参阅 [`AI_DEVELOPMENT_ACKNOWLEDGMENT.md`](AI_DEVELOPMENT_ACKNOWLEDGMENT.md)。
 
 ## Acknowledgments / 致谢
 
-Thanks to all developers who have contributed to this project. / 感谢所有为这个项目做出贡献的开发者。
+Thanks to all developers and AI systems that have contributed to this project. / 感谢所有为这个项目做出贡献的开发者和AI系统。
+
+Special thanks to:
+- **AI Coding Agents**: For technical implementation and code optimization / AI编码代理：技术实现和代码优化
+- **Open Source Community**: For the foundational libraries and tools / 开源社区：基础库和工具支持

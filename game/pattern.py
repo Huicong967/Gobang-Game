@@ -39,31 +39,34 @@ class PatternManager:
         """加载可用的棋谱列表"""
         self.patterns_list = []
         
-        # 一手胜题目 (只保留三个初级棋谱)
+        # 一手胜题目 (初级第1-3题)
         for i in range(1, 4):
+            pattern_id = f"one_move_{i}"
             self.patterns_list.append({
-                "id": f"one_move_{i}",
-                "name": f"One Move Victory #{i} / 一手胜 第{i}题",
+                "id": pattern_id,
+                "name": self._format_pattern_name(pattern_id, "Beginner"),
                 "difficulty": "Beginner / 初级",
                 "description": f"Find the winning move in one step / 一手制胜第{i}题"
             })
         
-        # 两手胜题目 (31-35)  
+        # 两手胜题目 (中级第4-8题，原ID 31-35)  
         for i in range(31, 36):
+            pattern_id = f"two_move_{i}"
             self.patterns_list.append({
-                "id": f"two_move_{i}",
-                "name": f"Two Move Victory #{i} / 两手胜 第{i}题", 
+                "id": pattern_id,
+                "name": self._format_pattern_name(pattern_id, "Intermediate"), 
                 "difficulty": "Intermediate / 中级",
-                "description": f"Find the winning sequence in two moves / 两手制胜第{i}题"
+                "description": f"Find the winning sequence in two moves / 两手制胜第{i-27}题"
             })
         
-        # 三手胜题目 (91-95)
+        # 三手胜题目 (高级第9-13题，原ID 91-95)
         for i in range(91, 96):
+            pattern_id = f"three_move_{i}"
             self.patterns_list.append({
-                "id": f"three_move_{i}",
-                "name": f"Three Move Victory #{i} / 三手胜 第{i}题",
+                "id": pattern_id,
+                "name": self._format_pattern_name(pattern_id, "Advanced"),
                 "difficulty": "Advanced / 高级", 
-                "description": f"Find the winning sequence in three moves / 三手制胜第{i}题"
+                "description": f"Find the winning sequence in three moves / 三手制胜第{i-82}题"
             })
     
     def get_patterns_list(self):
@@ -98,6 +101,34 @@ class PatternManager:
         except Exception as e:
             print(f"加载棋谱失败: {e}")
             return False
+    
+    def _format_pattern_name(self, pattern_id, difficulty):
+        """格式化棋谱名称 / Format pattern name"""
+        # 按照棋谱在游戏中的实际顺序重新编号（连续编号1-13）
+        pattern_order = {
+            # 初级 1-3题 (一手胜)
+            "one_move_1": (1, "Beginner / 初级"),
+            "one_move_2": (2, "Beginner / 初级"), 
+            "one_move_3": (3, "Beginner / 初级"),
+            # 中级 4-8题 (二手胜)
+            "two_move_31": (4, "Intermediate / 中级"),
+            "two_move_32": (5, "Intermediate / 中级"),
+            "two_move_33": (6, "Intermediate / 中级"),
+            "two_move_34": (7, "Intermediate / 中级"),
+            "two_move_35": (8, "Intermediate / 中级"),
+            # 高级 9-13题 (三手胜)
+            "three_move_91": (9, "Advanced / 高级"),
+            "three_move_92": (10, "Advanced / 高级"),
+            "three_move_93": (11, "Advanced / 高级"),
+            "three_move_94": (12, "Advanced / 高级"),
+            "three_move_95": (13, "Advanced / 高级"),
+        }
+        
+        if pattern_id in pattern_order:
+            num, diff_text = pattern_order[pattern_id]
+            return f"Endgame #{num} ({diff_text.split(' / ')[0]}) / 残局第{num}题 ({diff_text.split(' / ')[1]})"
+        else:
+            return pattern_id.replace("_", " ").title()
     
     def _get_built_in_patterns(self):
         """获取内置残局棋谱数据"""
@@ -216,8 +247,8 @@ class PatternManager:
             
             patterns[pattern_id] = {
                 "id": pattern_id,
-                "name": pattern_id.replace("_", " ").title(),
-                "difficulty": "初级",
+                "name": self._format_pattern_name(pattern_id, "初级"),
+                "difficulty": "Beginner / 初级",
                 "description": description,
                 "initial_setup": initial_setup,
                 "moves": move_sequence,
@@ -267,8 +298,8 @@ class PatternManager:
             
             patterns[pattern_id] = {
                 "id": pattern_id,
-                "name": pattern_id.replace("_", " ").title(),
-                "difficulty": "中级",
+                "name": self._format_pattern_name(pattern_id, "中级"),
+                "difficulty": "Intermediate / 中级",
                 "description": description,
                 "initial_setup": initial_setup,
                 "moves": move_sequence,
@@ -317,8 +348,8 @@ class PatternManager:
             
             patterns[pattern_id] = {
                 "id": pattern_id,
-                "name": pattern_id.replace("_", " ").title(),
-                "difficulty": "高级",
+                "name": self._format_pattern_name(pattern_id, "高级"),
+                "difficulty": "Advanced / 高级",
                 "description": description, 
                 "initial_setup": initial_setup,
                 "moves": move_sequence,

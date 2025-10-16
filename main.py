@@ -2,8 +2,16 @@
 Gobang Pattern Battle System Main Program
 五子棋棋谱对战系统主程序
 
+AI-Assisted Development / AI辅助开发
+This project was developed with the assistance of AI coding agents.
+本项目由AI代理辅助编码完成。
+
 Author / 作者：Xu Huicong
+AI Assistant / AI助手：GitHub Copilot & AI Coding Agents
 Run this file to start the game / 运行此文件启动游戏
+
+For detailed AI development acknowledgment, see AI_DEVELOPMENT_ACKNOWLEDGMENT.md
+详细的AI开发说明请参见 AI_DEVELOPMENT_ACKNOWLEDGMENT.md
 """
 
 import sys

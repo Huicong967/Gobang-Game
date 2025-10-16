@@ -13,7 +13,7 @@ import os
 # 添加项目根目录到路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game import Board, PatternManager, MoveValidator
+from game import Board, PatternManager, MoveValidator, sound_manager
 
 
 class GameWindow:
@@ -30,6 +30,9 @@ class GameWindow:
         self.board = Board()
         self.pattern_manager = PatternManager()
         self.validator = MoveValidator(self.pattern_manager, self.board)
+        
+        # 音效管理器
+        self.sound_manager = sound_manager
         
         # GUI 变量
         self.canvas_size = 480
@@ -70,6 +73,11 @@ class GameWindow:
         ttk.Button(control_frame, text="Restart / 重新开始", command=self.restart_pattern).pack(side=tk.LEFT, padx=5)
         ttk.Button(control_frame, text="Undo / 悔棋", command=self.undo_move).pack(side=tk.LEFT, padx=5)
         ttk.Button(control_frame, text="Show Answer / 显示答案", command=self.show_answer).pack(side=tk.LEFT, padx=5)
+        
+        # 音效控制按钮
+        self.sound_button_text = tk.StringVar()
+        self.sound_button_text.set("🔊 Sound ON / 音效开" if self.sound_manager.is_enabled() else "🔇 Sound OFF / 音效关")
+        ttk.Button(control_frame, textvariable=self.sound_button_text, command=self.toggle_sound).pack(side=tk.LEFT, padx=5)
         
         # 右侧 - 信息区域 / Right side - Information area
         info_frame = ttk.LabelFrame(main_frame, text="Game Information / 游戏信息", padding="10")
@@ -200,15 +208,18 @@ class GameWindow:
             correct_move = result['correct_move']
             if correct_move:
                 self.board.make_move(row, col, correct_move[2])
+                self.sound_manager.play_stone_place()  # 播放落子音效
             self.draw_stones()
             self.add_hint(result['message'])
             self.update_status()
             if result['pattern_complete']:
+                self.sound_manager.play_pattern_complete()  # 播放完成音效
                 self.show_pattern_analysis()
             elif result.get('computer_move', False):
                 # 延迟一点时间让玩家看到自己的走法，然后电脑走棋
                 self.root.after(800, self.make_computer_move)
         else:
+            self.sound_manager.play_error()  # 播放错误音效
             self.add_hint(result['message'])
             if result['show_answer']:
                 self.root.after(1000, self.auto_make_correct_move)
@@ -222,6 +233,7 @@ class GameWindow:
         
         if result['move']:
             row, col, player = result['move']
+            self.sound_manager.play_stone_place()  # 播放落子音效
             self.draw_stones()  # 重新绘制棋盘
             self.add_hint(result['message'])
             self.update_status()
@@ -292,6 +304,7 @@ class GameWindow:
             self.add_hint("Please select a pattern first! / 请先选择一个棋谱！")
             return
         
+        self.sound_manager.play_game_start()  # 播放游戏开始音效
         self.board.reset()
         self.pattern_manager.reset_pattern()
         self.validator.reset_game()
@@ -450,6 +463,15 @@ class GameWindow:
         col_letter = chr(ord('A') + col)
         row_number = row + 1
         return f"{col_letter}{row_number}"
+    
+    def toggle_sound(self):
+        """切换音效开关 / Toggle sound on/off"""
+        self.sound_manager.play_button_click()
+        enabled = self.sound_manager.toggle_sound()
+        self.sound_button_text.set("🔊 Sound ON / 音效开" if enabled else "🔇 Sound OFF / 音效关")
+        
+        status = "enabled / 已启用" if enabled else "disabled / 已禁用"
+        self.add_hint(f"Sound {status} / 音效{status}")
     
     def run(self):
         """运行游戏"""
