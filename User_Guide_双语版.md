@@ -1,44 +1,106 @@
-# Gobang Pattern Battle System User Guide / 五子棋棋谱对战系统使用说明
+# Gobang Endgame Training System User Guide / 五子棋残局训练系统使用说明
+
+## Download and Installation / 下载和安装
+
+### Step 1: Download the Game / 第一步：下载游戏
+
+**Method A: GitHub Download / 方法A：GitHub下载**
+1. Visit the project page / 访问项目页面: https://github.com/Huicong967/Gobang-Game
+2. Click "Code" → "Download ZIP" / 点击"Code"→"Download ZIP"  
+3. Extract the ZIP file to your desired location / 将ZIP文件解压到指定位置
+
+**Method B: Git Clone / 方法B：Git克隆**
+```bash
+git clone https://github.com/Huicong967/Gobang-Game.git
+cd Gobang-Game
+```
+
+### Step 2: Install Dependencies / 第二步：安装依赖
+
+**Automatic Installation (Recommended) / 自动安装（推荐）**
+```bash
+pip install -r requirements.txt
+```
+
+**Manual Installation / 手动安装**
+```bash
+pip install pygame numpy
+```
+
+### Step 3: Launch the Game / 第三步：启动游戏
+
+**Method A: Windows Batch File / 方法A：Windows批处理文件**
+- Double-click `启动游戏.bat` / 双击 `启动游戏.bat`
+- The script will automatically check dependencies and launch the game / 脚本会自动检查依赖并启动游戏
+
+**Method B: Command Line / 方法B：命令行**
+```bash
+python main.py
+```
+
+**Method C: Direct Python / 方法C：直接Python运行**
+```bash
+cd "path/to/Gobang-Game"
+python main.py
+```
 
 ## Game Introduction / 游戏简介
 
-This is a player vs computer Gobang battle system. Players use black stones, computer uses white stones, strictly following classic patterns for battles. Through real battle experience, help players master classic Gobang tactics and opening strategies.
+This is an endgame training system where players practice solving classic Gobang endgame positions. Players use white stones to find winning moves while the computer sets up black stone patterns according to classic endgames.
 
-这是一个玩家vs电脑的五子棋对战系统。玩家执黑子，电脑执白子，严格按照经典棋谱进行对战。通过真实的对战体验，帮助玩家掌握五子棋的经典战术和开局技巧。
+这是一个残局训练系统，玩家练习解决经典五子棋残局。玩家执白子寻找制胜走法，电脑按照经典残局执黑子进行布局。
+
+## 🌍 New Feature: Language Selection / 新功能：语言选择
+
+### Complete Single-Language Experience / 完整的单语体验
+- **At Startup / 启动时**: Choose your preferred language (English/Chinese) / 选择您的首选语言（英文/中文）
+- **Unified Interface / 统一界面**: All game elements display in your chosen language / 所有游戏元素使用您选择的语言显示
+- **No Mixed Text / 无混合文本**: Clean, professional single-language experience / 清洁、专业的单语体验
+- **Pattern Localization / 棋谱本地化**: Pattern names, descriptions, and analysis in your language / 棋谱名称、描述和分析使用您的语言
+- **Smart Hints / 智能提示**: Error messages and area hints in your preferred language / 错误消息和区域提示使用您的首选语言
 
 ## Main Features / 主要特点
 
-- **Real Battle Experience / 真实对战体验**: Player uses black stones vs computer uses white stones for turn-based battle / 玩家执黑子vs电脑执白子，真实的回合制对战
-- **Classic Pattern Battle / 经典棋谱对战**: Based on classic Gobang patterns of multiple difficulty levels / 基于多个难度级别的经典五子棋棋谱
-- **Intelligent Move Validation / 智能走法验证**: Real-time validation of whether player moves comply with patterns / 实时验证玩家走法是否符合棋谱
-- **Computer Auto Response / 电脑自动应战**: Computer strictly follows patterns for responses, never makes mistakes / 电脑严格按照棋谱进行回应，不会出错
-- **Error Tolerance Mechanism / 容错机制**: Allows 3 errors, auto-demonstrates correct moves when exceeded / 允许3次错误，超出后自动演示正确走法
-- **Deep Tactical Analysis / 深度战术解析**: Detailed pattern analysis displayed after battle completion / 对战完成后显示详细的棋谱分析
+- **🌍 Language Selection / 语言选择**: Choose English or Chinese at startup for complete localization / 启动时选择英文或中文，享受完整本地化
+- **🎯 Endgame Training / 残局训练**: Player uses white stones to solve classic endgame positions / 玩家执白子解决经典残局局面  
+- **📚 Localized Patterns / 本地化棋谱**: Pattern content dynamically translated to your chosen language / 棋谱内容动态翻译为您选择的语言
+- **🤖 Computer Setup / 电脑布局**: Computer uses black stones to set up endgame positions according to patterns / 电脑执黑子按棋谱布局残局
+- **🎯 Intelligent Move Validation / 智能走法验证**: Real-time validation of whether player moves solve the endgame / 实时验证玩家走法是否解决残局
+- **💡 Smart Error Handling / 智能错误处理**: Localized hints and area guidance when moves are incorrect / 走错时提供本地化提示和区域指导
+- **📖 Error Tolerance Mechanism / 容错机制**: Allows 3 errors, auto-demonstrates correct moves when exceeded / 允许3次错误，超出后自动演示正确走法
+- **🔍 Deep Tactical Analysis / 深度战术解析**: Detailed pattern analysis in your language after completion / 完成后用您的语言显示详细的棋谱分析
 
 ## How to Use / 如何使用
 
-### 1. Start Game / 启动游戏
-Run `python main.py` to start the game window / 运行 `python main.py` 启动游戏窗口
+### 1. First Launch and Language Selection / 首次启动和语言选择
+- Launch the game using any of the methods above / 使用上述任一方法启动游戏
+- **Language Selection Dialog / 语言选择对话框** will appear first / 首先出现语言选择对话框
+- Choose "English" for complete English interface / 选择"English"获得完整英文界面
+- Choose "中文" for complete Chinese interface / 选择"中文"获得完整中文界面
+- Your choice will be saved for future launches / 您的选择将被保存供将来启动使用
 
 ### 2. Select Pattern / 选择棋谱
-- Click "Select Pattern" button / 点击"选择棋谱"按钮
-- Choose from the list the pattern you want to practice / 从列表中选择想要练习的棋谱
+- Click "Select Pattern" button (or "选择棋谱" in Chinese) / 点击"Select Pattern"按钮（中文界面为"选择棋谱"）
+- Choose from the list the endgame pattern you want to practice / 从列表中选择想要练习的残局棋谱
 - Patterns are divided into Beginner, Intermediate, Advanced difficulty levels / 棋谱分为初级、中级、高级三个难度
+- All pattern names and descriptions will be in your chosen language / 所有棋谱名称和描述将使用您选择的语言
 
-### 3. Start Battle / 开始对战
-- You use black stones, computer uses white stones / 你执黑子，电脑执白子
-- Click board intersections to place black stones / 鼠标点击棋盘交叉点下黑子
-- Computer will immediately respond with white stones according to pattern / 电脑会立即按照棋谱进行白子回应
-- Continue turn-based battle until pattern ends / 继续轮流对战直到棋谱结束
+### 3. Start Training / 开始训练
+- You use white stones to find the winning move / 你执白子寻找制胜走法
+- Computer has already set up the black stone endgame position / 电脑已经布置好黑子残局局面
+- Click board intersections to place white stones / 鼠标点击棋盘交叉点下白子
+- Find the correct winning sequence according to the pattern / 根据棋谱找出正确的制胜序列
 
 ### 4. Error Handling / 错误处理
-- System prompts errors and gives position hints when wrong moves are made / 走错时系统提示错误并给出位置提示
+- System prompts errors in your language when wrong moves are made / 走错时系统用您的语言提示错误
+- Provides localized area hints (e.g., "upper left area" or "棋盘上方左侧区域") / 提供本地化的区域提示
 - Maximum 3 error attempts per move / 每步最多允许3次错误尝试
-- System auto-demonstrates correct moves after 3 errors and continues battle / 3次错误后系统自动演示正确走法并继续对战
+- System auto-demonstrates correct moves after 3 errors / 3次错误后系统自动演示正确走法
 
 ### 5. View Analysis / 查看分析
-- Right side displays detailed tactical analysis after pattern completion / 棋谱完成后，右侧会显示详细的战术分析
-- Includes opening ideas, key steps, victory principles etc. / 包括开局思路、关键步骤、胜利原理等
+- Right side displays detailed tactical analysis in your language after pattern completion / 棋谱完成后，右侧用您的语言显示详细的战术分析
+- Includes strategy, key points, victory principles etc. / 包括策略、关键点、胜利原理等
+- All analysis content is fully localized / 所有分析内容完全本地化
 
 ## Interface Description / 界面说明
 

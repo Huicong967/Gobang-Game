@@ -2,6 +2,50 @@
 import os
 from typing import List, Dict, Tuple, Optional
 
+# 棋谱翻译数据
+PATTERN_TRANSLATIONS = {
+    'english': {
+        'one_move_prefix': 'One Move Win',
+        'two_move_prefix': 'Two Move Win', 
+        'three_move_prefix': 'Three Move Win',
+        'difficulty_beginner': 'Beginner',
+        'difficulty_intermediate': 'Intermediate', 
+        'difficulty_advanced': 'Advanced',
+        'description_one_move': 'First 3 moves completed, white seeks winning move',
+        'description_two_move': 'First 5 moves completed, white seeks winning combination',
+        'description_three_move': 'First 7 moves completed, white seeks complex win',
+        'analysis_strategy': 'Observe the endgame position and find the key winning move',
+        'analysis_key_points': [
+            'Analyze current pattern',
+            'Find breakthrough point', 
+            'Execute winning sequence'
+        ],
+        'analysis_win_one': 'One move victory: White {} completes winning connection',
+        'analysis_win_two': 'Two move victory: White creates dual threats',
+        'analysis_win_three': 'Three move victory: White executes complex combination'
+    },
+    'chinese': {
+        'one_move_prefix': '一手胜',
+        'two_move_prefix': '二手胜',
+        'three_move_prefix': '三手胜', 
+        'difficulty_beginner': '初级',
+        'difficulty_intermediate': '中级',
+        'difficulty_advanced': '高级',
+        'description_one_move': '前3手已下完，白子寻找制胜一手',
+        'description_two_move': '前5手已下完，白子寻找制胜组合',
+        'description_three_move': '前7手已下完，白子寻找复杂制胜',
+        'analysis_strategy': '观察残局局面，找出制胜的关键一手',
+        'analysis_key_points': [
+            '分析当前棋型',
+            '寻找突破点',
+            '执行制胜序列'
+        ],
+        'analysis_win_one': '一手制胜：白子{}完成制胜连接',
+        'analysis_win_two': '二手制胜：白子形成双重威胁',
+        'analysis_win_three': '三手制胜：白子执行复杂组合'
+    }
+}
+
 
 def coord_to_pos(coord_str):
     """将棋谱坐标转换为数组坐标 (如 'H8' -> (7, 7))"""
@@ -33,7 +77,18 @@ class PatternManager:
         self.current_pattern = None
         self.current_step = 0
         self.patterns_list = []
+        self.current_language = 'english'  # 默认语言
         self._load_patterns_list()
+    
+    def set_language(self, language):
+        """设置语言并重新加载棋谱列表"""
+        if language in PATTERN_TRANSLATIONS:
+            self.current_language = language
+            self._load_patterns_list()
+    
+    def _get_text(self, key):
+        """获取本地化文本"""
+        return PATTERN_TRANSLATIONS[self.current_language].get(key, key)
     
     def _load_patterns_list(self):
         """加载可用的棋谱列表"""
@@ -42,31 +97,40 @@ class PatternManager:
         # 一手胜题目 (初级第1-3题)
         for i in range(1, 4):
             pattern_id = f"one_move_{i}"
+            name = f"{self._get_text('one_move_prefix')} {i}"
+            difficulty = self._get_text('difficulty_beginner')
+            description = self._get_text('description_one_move')
             self.patterns_list.append({
                 "id": pattern_id,
-                "name": self._format_pattern_name(pattern_id, "Beginner"),
-                "difficulty": "Beginner / 初级",
-                "description": f"Find the winning move in one step / 一手制胜第{i}题"
+                "name": name,
+                "difficulty": difficulty,
+                "description": description
             })
         
         # 两手胜题目 (中级第4-8题，原ID 31-35)  
         for i in range(31, 36):
             pattern_id = f"two_move_{i}"
+            name = f"{self._get_text('two_move_prefix')} {i-30}"
+            difficulty = self._get_text('difficulty_intermediate')
+            description = self._get_text('description_two_move')
             self.patterns_list.append({
                 "id": pattern_id,
-                "name": self._format_pattern_name(pattern_id, "Intermediate"), 
-                "difficulty": "Intermediate / 中级",
-                "description": f"Find the winning sequence in two moves / 两手制胜第{i-27}题"
+                "name": name,
+                "difficulty": difficulty,
+                "description": description
             })
         
         # 三手胜题目 (高级第9-13题，原ID 91-95)
         for i in range(91, 96):
             pattern_id = f"three_move_{i}"
+            name = f"{self._get_text('three_move_prefix')} {i-90}"
+            difficulty = self._get_text('difficulty_advanced')
+            description = self._get_text('description_three_move')
             self.patterns_list.append({
                 "id": pattern_id,
-                "name": self._format_pattern_name(pattern_id, "Advanced"),
-                "difficulty": "Advanced / 高级", 
-                "description": f"Find the winning sequence in three moves / 三手制胜第{i-82}题"
+                "name": name,
+                "difficulty": difficulty,
+                "description": description
             })
     
     def get_patterns_list(self):
@@ -245,22 +309,22 @@ class PatternManager:
             initial_setup = [coord_to_pos(pos) + (player,) for pos, player in setup if coord_to_pos(pos)]
             move_sequence = [coord_to_pos(pos) + (player,) for pos, player in moves if coord_to_pos(pos)]
             
+            # 提取题号
+            pattern_num = pattern_id.split('_')[-1]
+            pattern_name = f"{self._get_text('one_move_prefix')} {pattern_num}"
+            
             patterns[pattern_id] = {
                 "id": pattern_id,
-                "name": self._format_pattern_name(pattern_id, "初级"),
-                "difficulty": "Beginner / 初级",
-                "description": description,
+                "name": pattern_name,
+                "difficulty": self._get_text('difficulty_beginner'),
+                "description": self._get_text('description_one_move'),
                 "initial_setup": initial_setup,
                 "moves": move_sequence,
                 "analysis": {
-                    "opening": description,
-                    "strategy": "Observe the endgame position and find the key winning move / 观察残局局面，找出制胜的关键一手",
-                    "key_points": [
-                        "Analyze current pattern / 分析当前棋型", 
-                        "Find breakthrough point / 寻找突破点", 
-                        "One move victory / 一手制胜"
-                    ],
-                    "win_reason": analysis
+                    "opening": self._get_text('description_one_move'),
+                    "strategy": self._get_text('analysis_strategy'),
+                    "key_points": self._get_text('analysis_key_points'),
+                    "win_reason": self._get_text('analysis_win_one').format(moves[0][0] if moves else '')
                 }
             }
         
@@ -296,23 +360,22 @@ class PatternManager:
             initial_setup = [coord_to_pos(pos) + (player,) for pos, player in setup if coord_to_pos(pos)]
             move_sequence = [coord_to_pos(pos) + (player,) for pos, player in moves if coord_to_pos(pos)]
             
+            # 提取题号
+            pattern_num = pattern_id.split('_')[-1]
+            pattern_name = f"{self._get_text('two_move_prefix')} {int(pattern_num) - 30}"
+            
             patterns[pattern_id] = {
                 "id": pattern_id,
-                "name": self._format_pattern_name(pattern_id, "中级"),
-                "difficulty": "Intermediate / 中级",
-                "description": description,
+                "name": pattern_name,
+                "difficulty": self._get_text('difficulty_intermediate'),
+                "description": self._get_text('description_two_move'),
                 "initial_setup": initial_setup,
                 "moves": move_sequence,
                 "analysis": {
-                    "opening": description,
-                    "strategy": "Through cooperation of two consecutive moves, form threat-four tactics to force opponent defense then complete victory / 通过连续两手棋的配合，形成冲四战术，迫使对手防守后完成制胜",
-                    "key_points": [
-                        "Observe pattern / 观察棋形", 
-                        "Find threat-four point / 找出冲四点", 
-                        "Calculate follow-up attacks / 计算后续连击", 
-                        "Complete victory / 完成制胜"
-                    ],
-                    "win_reason": analysis
+                    "opening": self._get_text('description_two_move'),
+                    "strategy": self._get_text('analysis_strategy'),
+                    "key_points": self._get_text('analysis_key_points'),
+                    "win_reason": self._get_text('analysis_win_two')
                 }
             }        # 三手胜题目 (91-95) - 修正为7手初始局面，更合理的棋子分布
         three_move_data = [
@@ -346,24 +409,22 @@ class PatternManager:
             initial_setup = [coord_to_pos(pos) + (player,) for pos, player in setup if coord_to_pos(pos)]
             move_sequence = [coord_to_pos(pos) + (player,) for pos, player in moves if coord_to_pos(pos)]
             
+            # 提取题号
+            pattern_num = pattern_id.split('_')[-1]
+            pattern_name = f"{self._get_text('three_move_prefix')} {int(pattern_num) - 90}"
+            
             patterns[pattern_id] = {
                 "id": pattern_id,
-                "name": self._format_pattern_name(pattern_id, "高级"),
-                "difficulty": "Advanced / 高级",
-                "description": description, 
+                "name": pattern_name,
+                "difficulty": self._get_text('difficulty_advanced'),
+                "description": self._get_text('description_three_move'),
                 "initial_setup": initial_setup,
                 "moves": move_sequence,
                 "analysis": {
-                    "opening": description,
-                    "strategy": "Through precise cooperation of three moves, create continuous threat-fours forming multiple threats, forcing opponent into exhaustive defense then achieving victory / 通过三手棋的精密配合，连续冲四形成多重威胁，迫使对手疲于防守最终获胜",
-                    "key_points": [
-                        "First move: Threat-four / 第一步冲四", 
-                        "Second move: New threat / 第二步威胁", 
-                        "Third move: Victory / 第三步制胜", 
-                        "Continuous calculation / 连续计算", 
-                        "Double threat / 双重威胁"
-                    ],
-                    "win_reason": analysis
+                    "opening": self._get_text('description_three_move'),
+                    "strategy": self._get_text('analysis_strategy'),
+                    "key_points": self._get_text('analysis_key_points'),
+                    "win_reason": self._get_text('analysis_win_three')
                 }
             }
         

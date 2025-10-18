@@ -11,22 +11,53 @@ from typing import Tuple, Optional
 class MoveValidator:
     """走法验证器 - 残局训练模式（玩家固定执行一种颜色）"""
     
-    def __init__(self, pattern_manager, board):
+    def __init__(self, pattern_manager, board, language_manager=None):
         """
         初始化验证器
         
         Args:
             pattern_manager: 棋谱管理器
             board: 棋盘对象
+            language_manager: 语言管理器
         """
         self.pattern_manager = pattern_manager
         self.board = board
+        self.language_manager = language_manager
         self.error_count = 0
         self.max_errors = 3
         self.last_error_move = None
         self.player_color = None  # 玩家固定执行的颜色 (1=黑子, 2=白子)
         self.computer_color = None  # 电脑固定执行的颜色
         self.is_player_turn = True  # 当前是否轮到玩家
+    
+    def _get_text(self, key, *args):
+        """获取翻译文本"""
+        if self.language_manager and hasattr(self.language_manager, 'get_text'):
+            return self.language_manager.get_text(key, *args)
+        else:
+            # 如果没有语言管理器，返回默认英文
+            default_texts = {
+                'computer_turn_wait': "Computer's turn, please wait...",
+                'pattern_completed': 'Pattern completed!',
+                'correct_move': 'Correct move!',
+                'correct_move_computer_thinking': 'Correct move! Computer thinking...',
+                'wrong_max_times': 'Wrong {} times, correct move is:',
+                'wrong_move_chances_left': 'Wrong move! {} chances left. Hint:',
+                'area_upper': 'upper',
+                'area_middle': 'middle',
+                'area_lower': 'lower',
+                'area_left': 'left',
+                'area_center': 'center',
+                'area_right': 'right',
+                'area_hint': '{} {} area',
+                'its_player_turn': "It's player's turn!",
+                'computer_moved_your_turn': 'Computer moved, your turn!',
+                'computer_move_failed': 'Computer move failed!'
+            }
+            text = default_texts.get(key, key)
+            if args:
+                return text.format(*args)
+            return text
     
     def validate_player_move(self, row, col):
         """
@@ -50,7 +81,7 @@ class MoveValidator:
         if not self.is_player_turn:
             return {
                 'valid': False,
-                'message': "Computer's turn, please wait... / 现在轮到电脑下棋，请等待...",
+                'message': self._get_text('computer_turn_wait'),
                 'correct_move': None,
                 'show_answer': False,
                 'pattern_complete': False,
@@ -62,7 +93,7 @@ class MoveValidator:
         if not expected_move:
             return {
                 'valid': False,
-                'message': 'Pattern completed! / 棋谱已完成！',
+                'message': self._get_text('pattern_completed'),
                 'correct_move': None,
                 'show_answer': False,
                 'pattern_complete': True,
@@ -75,7 +106,7 @@ class MoveValidator:
         if expected_color != self.player_color:
             return {
                 'valid': False,
-                'message': "Computer's turn, please wait... / 现在轮到电脑下棋，请等待...",
+                'message': self._get_text('computer_turn_wait'),
                 'correct_move': None,
                 'show_answer': False,
                 'pattern_complete': False,
@@ -97,7 +128,7 @@ class MoveValidator:
             
             return {
                 'valid': True,
-                'message': 'Correct move! / 走法正确！' if pattern_complete else 'Correct move! Computer thinking... / 走法正确！电脑思考中...',
+                'message': self._get_text('correct_move') if pattern_complete else self._get_text('correct_move_computer_thinking'),
                 'correct_move': expected_move,
                 'show_answer': False,
                 'pattern_complete': pattern_complete,
@@ -112,7 +143,7 @@ class MoveValidator:
                 # 达到最大错误次数，显示正确答案
                 return {
                     'valid': False,
-                    'message': f'Wrong {self.max_errors} times, correct move is: {self._format_position(expected_row, expected_col)} / 已错误{self.max_errors}次，正确走法是：{self._format_position(expected_row, expected_col)}',
+                    'message': f'{self._get_text("wrong_max_times", self.max_errors)} {self._format_position(expected_row, expected_col)}',
                     'correct_move': expected_move,
                     'show_answer': True,
                     'pattern_complete': False,
@@ -122,7 +153,7 @@ class MoveValidator:
                 # 还有重试机会
                 return {
                     'valid': False,
-                    'message': f'Wrong move! {self.max_errors - self.error_count} chances left. Hint: {self._get_hint(expected_row, expected_col)} / 走法错误！还有{self.max_errors - self.error_count}次机会。提示：{self._get_hint(expected_row, expected_col)}',
+                    'message': f'{self._get_text("wrong_move_chances_left", self.max_errors - self.error_count)} {self._get_hint(expected_row, expected_col)}',
                     'correct_move': expected_move,
                     'show_answer': False,
                     'pattern_complete': False,
@@ -160,31 +191,21 @@ class MoveValidator:
         board_size = self.board.size
         
         # 确定区域
-        row_region_en = ""
-        row_region_cn = ""
         if expected_row < board_size // 3:
-            row_region_en = "upper"
-            row_region_cn = "上方"
+            row_region = self._get_text("area_upper")
         elif expected_row < 2 * board_size // 3:
-            row_region_en = "middle"
-            row_region_cn = "中间"
+            row_region = self._get_text("area_middle")
         else:
-            row_region_en = "lower"
-            row_region_cn = "下方"
+            row_region = self._get_text("area_lower")
             
-        col_region_en = ""
-        col_region_cn = ""
         if expected_col < board_size // 3:
-            col_region_en = "left"
-            col_region_cn = "左侧"
+            col_region = self._get_text("area_left")
         elif expected_col < 2 * board_size // 3:
-            col_region_en = "center"
-            col_region_cn = "中间"
+            col_region = self._get_text("area_center")
         else:
-            col_region_en = "right"
-            col_region_cn = "右侧"
+            col_region = self._get_text("area_right")
         
-        return f"{row_region_en} {col_region_en} area / 棋盘{row_region_cn}{col_region_cn}区域"
+        return self._get_text("area_hint", row_region, col_region)
     
     def make_computer_move(self):
         """
@@ -201,7 +222,7 @@ class MoveValidator:
         if self.is_player_turn:
             return {
                 'move': None,
-                'message': "It's player's turn! / 现在轮到玩家下棋！",
+                'message': self._get_text('its_player_turn'),
                 'pattern_complete': False
             }
             
@@ -210,7 +231,7 @@ class MoveValidator:
         if not expected_move:
             return {
                 'move': None,
-                'message': 'Pattern completed! / 棋谱已完成！',
+                'message': self._get_text('pattern_completed'),
                 'pattern_complete': True
             }
             
@@ -220,7 +241,7 @@ class MoveValidator:
         if expected_color != self.computer_color:
             return {
                 'move': None,
-                'message': "It's player's turn! / 现在轮到玩家下棋！",
+                'message': self._get_text('its_player_turn'),
                 'pattern_complete': False
             }
         
@@ -234,9 +255,9 @@ class MoveValidator:
             pattern_complete = self.pattern_manager.is_pattern_complete()
             
             if pattern_complete:
-                message = 'Pattern completed! / 棋谱完成！'
+                message = self._get_text('pattern_completed')
             else:
-                message = 'Computer moved, your turn! / 电脑已下棋，轮到你了！'
+                message = self._get_text('computer_moved_your_turn')
             
             return {
                 'move': (expected_row, expected_col, expected_color),
@@ -246,7 +267,7 @@ class MoveValidator:
         
         return {
             'move': None,
-            'message': 'Computer move failed! / 电脑下棋失败！',
+            'message': self._get_text('computer_move_failed'),
             'pattern_complete': False
         }
     
