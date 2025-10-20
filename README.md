@@ -10,9 +10,44 @@ This project was developed with the assistance of AI coding agents. / 本项目�
 
 A player vs computer Gobang pattern battle system. Players use black stones, computer uses white stones, battle according to classic patterns to help players learn Gobang tactics and opening strategies.
 
-一个玩家vs电脑的五子棋棋谱对战系统。玩家执黑子，电脑执白子，按照经典棋谱进行对战练习，帮助玩家学习五子棋战术和开局技巧。
+一个玩家vs电脑的五子棋棋谱对战系统。玩家执白子进行残局训练，电脑执黑子按照经典棋谱进行布局，帮助玩家学习五子棋残局解法和战术技巧。
 
-![游戏截图](https://via.placeholder.com/600x400/f0f0f0/333333?text=Game+Screenshot)
+## 🎥 Game Demo / 游戏演示
+
+### 📹 Gameplay Video / 游戏演示视频
+Watch the complete gameplay demonstration to see the bilingual functionality and endgame training features in action:
+
+观看完整的游戏演示，了解双语功能和残局训练特色：
+
+**Demo Video / 演示视频**: [`Gobang game demo.mp4`](./Gobang%20game%20demo.mp4)
+
+### 🖼️ Screenshots / 游戏截图
+
+![Game Interface](https://via.placeholder.com/600x400/f0f0f0/333333?text=Game+Interface+%2F+游戏界面)
+
+*Game main interface with language selection and pattern training / 带有语言选择和棋谱训练的游戏主界面*
+
+### ✨ Demo Highlights / 演示亮点
+
+🌍 **Language Selection / 语言选择**
+- Startup language chooser dialog / 启动时的语言选择对话框
+- Complete interface localization / 完整的界面本地化
+- Single-language user experience / 单语用户体验
+
+🎯 **Endgame Training / 残局训练**
+- Pattern selection and loading / 棋谱选择和加载
+- Real-time move validation / 实时走法验证
+- Smart error correction system / 智能错误纠正系统
+
+🧠 **Pattern Analysis / 棋谱分析**
+- Detailed tactical breakdown / 详细的战术分析
+- Localized strategy explanations / 本地化的策略说明
+- Step-by-step solution guide / 逐步解法指导
+
+📱 **User Interface / 用户界面**
+- Clean, professional design / 简洁、专业的设计
+- Intuitive controls and feedback / 直观的控制和反馈
+- Responsive gameplay experience / 流畅的游戏体验
 
 ## Features / 功能特点
 
@@ -93,6 +128,48 @@ python main.py
    - ✅ **Pattern Localization / 棋谱本地化**: Pattern names, descriptions, and analysis in your chosen language / 棋谱名称、描述和分析使用您选择的语言
    - ✅ **Intelligent Hints / 智能提示**: Error messages and area hints in your preferred language / 错误消息和区域提示使用您的首选语言
    - ✅ **Complete User Experience / 完整用户体验**: Unified language throughout the entire game / 整个游戏使用统一语言
+
+## 📺 How to View the Demo / 如何观看演示
+
+### 🎬 Local Demo File / 本地演示文件
+The demo video is included in the project directory:
+演示视频包含在项目目录中：
+
+```
+📁 Gobang-Game/
+├── 📄 README.md
+├── 🎥 Gobang game demo.mp4  ← Demo video file / 演示视频文件
+├── 🐍 main.py
+└── 📁 Other files... / 其他文件...
+```
+
+### 🎮 What the Demo Shows / 演示内容
+The demo video demonstrates:
+演示视频展示了：
+
+1. **🌍 Language Selection Process / 语言选择过程**
+   - Startup language chooser dialog / 启动时的语言选择对话框
+   - Interface switching between English and Chinese / 英中文界面切换
+
+2. **📚 Pattern Training Features / 棋谱训练功能**  
+   - Selecting endgame patterns / 选择残局棋谱
+   - Pattern difficulty levels / 棋谱难度级别
+   - Localized pattern names and descriptions / 本地化的棋谱名称和描述
+
+3. **🎯 Gameplay Mechanics / 游戏机制**
+   - Player placing white stones / 玩家下白子
+   - Move validation and error correction / 走法验证和错误纠正
+   - Intelligent hint system / 智能提示系统
+
+4. **📖 Analysis and Learning / 分析和学习**
+   - Pattern completion and analysis / 棋谱完成和分析
+   - Tactical explanations in chosen language / 使用所选语言的战术解释
+   - Educational value demonstration / 教育价值展示
+
+### 📱 Viewing Tips / 观看建议
+- **Best Quality / 最佳质量**: Open with VLC Player or Windows Media Player / 使用VLC播放器或Windows媒体播放器打开
+- **Full Screen / 全屏**: Press F11 for better viewing experience / 按F11获得更好的观看体验
+- **Multiple Viewings / 多次观看**: Watch multiple times to understand all features / 多次观看以了解所有功能
 
 ## Game Instructions / 游戏说明
 
